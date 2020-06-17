@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using Mindbox.Data.Linq;
 
 namespace System.Data.Linq 
 {
-    public sealed class EntitySet<TEntity> : IList, IList<TEntity>, IListSource, IEntitySet
+    public sealed class EntitySet<TEntity> : IList, IList<TEntity>, IListSource
         where TEntity : class 
 	{
         private IEnumerable<TEntity> source;
@@ -154,13 +153,6 @@ namespace System.Data.Linq
 		}
 
 		public event ListChangedEventHandler ListChanged;
-
-		event EventHandler IEntitySet.ListChanging
-		{
-			add { listChanging += value; }
-			remove { listChanging -= value; }
-		}
-
 
 		/// <summary>
 		/// Returns true if values have been either assigned or loaded.

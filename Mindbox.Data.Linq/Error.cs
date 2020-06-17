@@ -9,136 +9,140 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 
-namespace System.Data.Linq {
-    /// <summary>
-    /// DLinq-providerbase-specific custom exception factory.
-    /// </summary>
-    internal class Error {
-        /// <summary>
-        /// Exception thrown when a query cannot execute against a particular SQL server version.
-        /// </summary>
-        static internal Exception ExpressionNotSupportedForSqlServerVersion(Collection<string> reasons) {
-            StringBuilder exceptionMessage = new StringBuilder("CannotTranslateExpressionToSql: ");
-            foreach (string reason in reasons) {
-                exceptionMessage.AppendLine(reason);
-            }
-            return new NotSupportedException(exceptionMessage.ToString());
-        }
+namespace System.Data.Linq
+{
+	/// <summary>
+	/// DLinq-providerbase-specific custom exception factory.
+	/// </summary>
+	internal class Error
+	{
+		/// <summary>
+		/// Exception thrown when a query cannot execute against a particular SQL server version.
+		/// </summary>
+		static internal Exception ExpressionNotSupportedForSqlServerVersion(Collection<string> reasons)
+		{
+			StringBuilder exceptionMessage = new StringBuilder("CannotTranslateExpressionToSql: ");
+			foreach (string reason in reasons)
+			{
+				exceptionMessage.AppendLine(reason);
+			}
+			return new NotSupportedException(exceptionMessage.ToString());
+		}
 
-	    public static Exception ArgumentNull(string sequence)
-	    {
-		    return new ArgumentNullException(sequence);
-	    }
+		public static Exception ArgumentNull(string sequence)
+		{
+			return new ArgumentNullException(sequence);
+		}
 
-	    public static Exception EntitySetDataBindingWithAbstractBaseClass(string name)
-	    {
-			return new InvalidOperationException("EntitySetDataBindingWithAbstractBaseClass: " + name + ".");
-	    }
+		public static Exception EntitySetDataBindingWithAbstractBaseClass(string name)
+		{
+			return new InvalidOperationException(String.Format(Strings.EntitySetDataBindingWithAbstractBaseClass, name));
+		}
 
-	    public static Exception EntitySetDataBindingWithNonPublicDefaultConstructor(string name)
-	    {
-			return new InvalidOperationException("EntitySetDataBindingWithNonPublicDefaultConstructor: " + name + ".");
-	    }
+		public static Exception EntitySetDataBindingWithNonPublicDefaultConstructor(string name)
+		{
+			return new InvalidOperationException(String.Format(Strings.EntitySetDataBindingWithNonPublicDefaultConstructor, name));
+		}
 
-	    public static Exception InvalidFieldInfo(Type objectType, Type fieldType, FieldInfo fi)
-	    {
-			return new InvalidOperationException("InvalidFieldInfo: " + objectType + ", " + fieldType + ", " + fi + ".");
-	    }
+		public static Exception InvalidFieldInfo(Type objectType, Type fieldType, FieldInfo fi)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { objectType, fieldType, fi }));
+		}
 
-	    public static Exception ArgumentWrongValue(string rowtype)
-	    {
-			return new ArgumentException("ArgumentWrongValue: " + rowtype + ".");
-	    }
+		public static Exception ArgumentWrongValue(string rowtype)
+		{
+			return new ArgumentException(Strings.DefaultErrorMessage(new object[] { rowtype }));
+		}
 
-	    public static Exception UnexpectedNode(SqlNodeType nodeType)
-	    {
-			return new InvalidOperationException("UnexpectedNode: " + nodeType + ".");
-	    }
+		public static Exception UnexpectedNode(SqlNodeType nodeType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { nodeType }));
+		}
 
 		public static Exception UnexpectedNode(SqlNode node)
 		{
-			return new InvalidOperationException("UnexpectedNode: " + node + ".");
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { node }));
 		}
 
 		public static Exception ColumnReferencedIsNotInScope(string getColumnName)
-	    {
-			return new InvalidOperationException("ColumnReferencedIsNotInScope: " + getColumnName + ".");
-	    }
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { getColumnName }));
+		}
 
-	    public static Exception CannotAddChangeConflicts()
-	    {
-			return new InvalidOperationException("CannotAddChangeConflicts");
-	    }
+		public static Exception CannotAddChangeConflicts()
+		{
+			return new InvalidOperationException(Strings.CannotAddChangeConflicts);
+		}
 
-	    public static Exception ExpectedQueryableArgument(string expression, Type qType)
-	    {
-			return new InvalidOperationException("ExpectedQueryableArgument: " + expression + ", " + qType + ".");
-	    }
+		public static Exception ExpectedQueryableArgument(string expression, Type qType)
+		{
+			return new InvalidOperationException(String.Format(Strings.ExpectedQueryableArgument, expression, qType));
+		}
 
-	    public static Exception ColumnClrTypeDoesNotAgreeWithExpressionsClrType()
-	    {
-			return new InvalidOperationException("ColumnClrTypeDoesNotAgreeWithExpressionsClrType");
-	    }
+		public static Exception ColumnClrTypeDoesNotAgreeWithExpressionsClrType()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception ProviderTypeNotFound(string provider)
-	    {
-			return new InvalidOperationException("ProviderTypeNotFound: " + provider + ".");
-	    }
+		public static Exception ProviderTypeNotFound(string provider)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { provider }));
+		}
 
-	    public static Exception ArgumentOutOfRange(string mi)
-	    {
-		    return new ArgumentOutOfRangeException(mi);
-	    }
+		public static Exception ArgumentOutOfRange(string mi)
+		{
+			return new ArgumentOutOfRangeException(mi);
+		}
 
-	    public static Exception ClassLiteralsNotAllowed(Type clrType)
-	    {
-			return new InvalidOperationException("ClassLiteralsNotAllowed: " + clrType + ".");
-	    }
+		public static Exception ClassLiteralsNotAllowed(Type clrType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { clrType }));
+		}
 
-	    public static Exception CouldNotHandleAliasRef(SqlNodeType nodeType)
-	    {
-			return new InvalidOperationException("CouldNotHandleAliasRef: " + nodeType + ".");
-	    }
+		public static Exception CouldNotHandleAliasRef(SqlNodeType nodeType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { nodeType }));
+		}
 
-	    public static Exception EmptyCaseNotSupported()
-	    {
-			return new InvalidOperationException("EmptyCaseNotSupported");
-	    }
+		public static Exception EmptyCaseNotSupported()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception ExpectedPredicateFoundBit()
-	    {
-			return new InvalidOperationException("ExpectedPredicateFoundBit");
-	    }
+		public static Exception ExpectedPredicateFoundBit()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception ExpectedBitFoundPredicate()
-	    {
-			return new InvalidOperationException("ExpectedBitFoundPredicate");
-	    }
+		public static Exception ExpectedBitFoundPredicate()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CouldNotFindTypeFromMapping(string name)
-	    {
-			return new InvalidOperationException("CouldNotFindTypeFromMapping: " + name + ".");
-	    }
+		public static Exception CouldNotFindTypeFromMapping(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception ConvertToCharFromBoolNotSupported()
-	    {
-			return new InvalidOperationException("ConvertToCharFromBoolNotSupported");
-	    }
+		public static Exception ConvertToCharFromBoolNotSupported()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CreateDatabaseFailedBecauseOfClassWithNoMembers(Type type)
-	    {
-			return new InvalidOperationException("CreateDatabaseFailedBecauseOfClassWithNoMembers: " + type + ".");
-	    }
+		public static Exception CreateDatabaseFailedBecauseOfClassWithNoMembers(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception MethodHasNoSupportConversionToSql(object x)
-	    {
-			return new InvalidOperationException("MethodHasNoSupportConversionToSql: " + x + ".");
-	    }
+		public static Exception MethodHasNoSupportConversionToSql(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
-	    public static Exception CannotAssignNull(Type type)
-	    {
-			return new InvalidOperationException("CannotAssignNull: " + type + ".");
-	    }
+		public static Exception CannotAssignNull(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
 		public static Exception CannotAssignNull(MemberInfo target)
 		{
@@ -147,1035 +151,1035 @@ namespace System.Data.Linq {
 		}
 
 		public static Exception UnsafeStringConversion(string toQueryString, string p1)
-	    {
-			return new InvalidOperationException("UnsafeStringConversion: " + toQueryString + ", " + p1 + ".");
-	    }
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { toQueryString, p1 }));
+		}
 
-	    public static Exception InsertAutoSyncFailure()
-	    {
-			return new InvalidOperationException("InsertAutoSyncFailure");
-	    }
+		public static Exception InsertAutoSyncFailure()
+		{
+			return new InvalidOperationException(Strings.InsertAutoSyncFailure);
+		}
 
-	    public static Exception CouldNotCreateAccessorToProperty(Type objectType, Type propertyType, PropertyInfo pi)
-	    {
+		public static Exception CouldNotCreateAccessorToProperty(Type objectType, Type propertyType, PropertyInfo pi)
+		{
 			return new InvalidOperationException(
-				"CouldNotCreateAccessorToProperty: " + objectType + ", " + propertyType + ", " + pi + ".");
-	    }
+				Strings.DefaultErrorMessage(new object[] { objectType, propertyType, pi }));
+		}
 
-	    public static Exception CannotAttachAddNonNewEntities()
-	    {
-			return new InvalidOperationException("CannotAttachAddNonNewEntities");
-	    }
+		public static Exception CannotAttachAddNonNewEntities()
+		{
+			return new InvalidOperationException(Strings.CannotAttachAddNonNewEntities);
+		}
 
-	    public static Exception InvalidMethodExecution(string name)
-	    {
-			return new InvalidOperationException("InvalidMethodExecution: " + name + ".");
-	    }
+		public static Exception InvalidMethodExecution(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception MappedTypeMustHaveDefaultConstructor(Type type)
-	    {
-			return new InvalidOperationException("MappedTypeMustHaveDefaultConstructor: " + type + ".");
-	    }
+		public static Exception MappedTypeMustHaveDefaultConstructor(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception TransactionDoesNotMatchConnection()
-	    {
-			return new InvalidOperationException("TransactionDoesNotMatchConnection");
-	    }
+		public static Exception TransactionDoesNotMatchConnection()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception InvalidFormatNode(object x)
-	    {
-			return new InvalidOperationException("InvalidFormatNode: " + x + ".");
-	    }
+		public static Exception InvalidFormatNode(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
 		public static Exception UnexpectedFloatingColumn()
-	    {
-			return new InvalidOperationException("UnexpectedFloatingColumn");
-	    }
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception UnexpectedTypeCode(object x)
-	    {
-			return new InvalidOperationException("UnexpectedTypeCode: " + x + ".");
-	    }
+		public static Exception UnexpectedTypeCode(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
-	    public static Exception UnexpectedSharedExpression()
-	    {
-			return new InvalidOperationException("UnexpectedSharedExpression");
-	    }
+		public static Exception UnexpectedSharedExpression()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception UnexpectedSharedExpressionReference()
-	    {
-			return new InvalidOperationException("UnexpectedSharedExpressionReference");
-	    }
+		public static Exception UnexpectedSharedExpressionReference()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception MethodCannotBeFound(string methodName)
-	    {
-			return new InvalidOperationException("MethodCannotBeFound: " + methodName + ".");
-	    }
+		public static Exception MethodCannotBeFound(string methodName)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { methodName }));
+		}
 
-	    public static Exception IncludeNotAllowedAfterFreeze()
-	    {
-			return new InvalidOperationException("IncludeNotAllowedAfterFreeze");
-	    }
+		public static Exception IncludeNotAllowedAfterFreeze()
+		{
+			return new InvalidOperationException(Strings.IncludeNotAllowedAfterFreeze);
+		}
 
-	    public static Exception NoMethodInTypeMatchingArguments(Type type)
-	    {
-			return new InvalidOperationException("NoMethodInTypeMatchingArguments: " + type + ".");
-	    }
+		public static Exception NoMethodInTypeMatchingArguments(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception SubqueryNotAllowedAfterFreeze()
-	    {
-			return new InvalidOperationException("SubqueryNotAllowedAfterFreeze");
-	    }
+		public static Exception SubqueryNotAllowedAfterFreeze()
+		{
+			return new InvalidOperationException(Strings.SubqueryNotAllowedAfterFreeze);
+		}
 
-	    public static Exception UnhandledStringTypeComparison()
-	    {
-			return new InvalidOperationException("UnhandledStringTypeComparison");
-	    }
+		public static Exception UnhandledStringTypeComparison()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception DataContextCannotBeUsedAfterDispose()
-	    {
-			return new InvalidOperationException("DataContextCannotBeUsedAfterDispose");
-	    }
+		public static Exception DataContextCannotBeUsedAfterDispose()
+		{
+			return new InvalidOperationException(Strings.DataContextCannotBeUsedAfterDispose);
+		}
 
-	    public static Exception UnableToAssignValueToReadonlyProperty(PropertyInfo pi)
-	    {
-			return new InvalidOperationException("UnableToAssignValueToReadonlyProperty: " + pi + ".");
-	    }
+		public static Exception UnableToAssignValueToReadonlyProperty(PropertyInfo pi)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { pi }));
+		}
 
-	    public static Exception DatabaseNodeNotFound(string httpSchemasMicrosoftComLinqtosqlMapping)
-	    {
-			return new InvalidOperationException("DatabaseNodeNotFound: " + httpSchemasMicrosoftComLinqtosqlMapping + ".");
-	    }
+		public static Exception DatabaseNodeNotFound(string httpSchemasMicrosoftComLinqtosqlMapping)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { httpSchemasMicrosoftComLinqtosqlMapping }));
+		}
 
-	    public static Exception UnrecognizedExpressionNode(object x)
-	    {
-			return new InvalidOperationException("UnrecognizedExpressionNode: " + x + ".");
-	    }
+		public static Exception UnrecognizedExpressionNode(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
-	    public static Exception InvalidUseOfGenericMethodAsMappedFunction(string name)
-	    {
-			return new InvalidOperationException("InvalidUseOfGenericMethodAsMappedFunction: " + name + ".");
-	    }
+		public static Exception InvalidUseOfGenericMethodAsMappedFunction(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception InvalidGroupByExpressionType(string name)
-	    {
-			return new InvalidOperationException("InvalidGroupByExpressionType: " + name + ".");
-	    }
+		public static Exception InvalidGroupByExpressionType(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception InvalidLoadOptionsLoadMemberSpecification()
-	    {
-			return new InvalidOperationException("InvalidLoadOptionsLoadMemberSpecification");
-	    }
+		public static Exception InvalidLoadOptionsLoadMemberSpecification()
+		{
+			return new InvalidOperationException(Strings.InvalidLoadOptionsLoadMemberSpecification);
+		}
 
-	    public static Exception ProviderTypeNull()
-	    {
-			return new InvalidOperationException("ProviderTypeNull");
-	    }
+		public static Exception ProviderTypeNull()
+		{
+			return new InvalidOperationException(Strings.ProviderTypeNull);
+		}
 
-	    public static Exception ProviderDoesNotImplementRequiredInterface(Type providerType, Type type)
-	    {
+		public static Exception ProviderDoesNotImplementRequiredInterface(Type providerType, Type type)
+		{
 			return new InvalidOperationException(
-				"ProviderDoesNotImplementRequiredInterface: " + providerType + ", " + type + ".");
-	    }
+				String.Format(Strings.ProviderDoesNotImplementRequiredInterface, providerType, type));
+		}
 
-	    public static Exception CouldNotConvert(Type fromType, Type toType)
-	    {
-			return new InvalidOperationException("CouldNotConvert: " + fromType + ", " + toType + ".");
-	    }
+		public static Exception CouldNotConvert(Type fromType, Type toType)
+		{
+			return new InvalidOperationException(String.Format(Strings.CouldNotConvert, fromType, toType));
+		}
 
-	    public static Exception ColumnIsDefinedInMultiplePlaces(string getColumnName)
-	    {
-			return new InvalidOperationException("ColumnIsDefinedInMultiplePlaces: " + getColumnName + ".");
-	    }
+		public static Exception ColumnIsDefinedInMultiplePlaces(string getColumnName)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { getColumnName }));
+		}
 
-	    public static Exception UnionIncompatibleConstruction()
-	    {
-			return new InvalidOperationException("UnionIncompatibleConstruction");
-	    }
+		public static Exception UnionIncompatibleConstruction()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception UnionDifferentMembers()
-	    {
-			return new InvalidOperationException("UnionDifferentMembers");
-	    }
+		public static Exception UnionDifferentMembers()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception UnionDifferentMemberOrder()
-	    {
-			return new InvalidOperationException("UnionDifferentMemberOrder");
-	    }
+		public static Exception UnionDifferentMemberOrder()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception UnhandledExpressionType(object x)
-	    {
-			return new InvalidOperationException("UnhandledExpressionType: " + x + ".");
-	    }
+		public static Exception UnhandledExpressionType(object x)
+		{
+			return new InvalidOperationException(String.Format(Strings.UnhandledExpressionType, x));
+		}
 
-	    public static Exception CouldNotFindRequiredAttribute(string attribute, string readOuterXml)
-	    {
-			return new InvalidOperationException("CouldNotFindRequiredAttribute: " + attribute + ", " + readOuterXml + ".");
-	    }
+		public static Exception CouldNotFindRequiredAttribute(string attribute, string readOuterXml)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { attribute, readOuterXml }));
+		}
 
-	    public static Exception LinkAlreadyLoaded()
-	    {
-			return new InvalidOperationException("LinkAlreadyLoaded");
-	    }
+		public static Exception LinkAlreadyLoaded()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception UnsupportedNodeType(ExpressionType nodeType)
-	    {
-			return new InvalidOperationException("UnsupportedNodeType: " + nodeType + ".");
-	    }
+		public static Exception UnsupportedNodeType(ExpressionType nodeType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { nodeType }));
+		}
 
-	    public static Exception UnhandledBindingType(MemberBindingType bindingType)
-	    {
-			return new InvalidOperationException("UnhandledBindingType: " + bindingType + ".");
-	    }
+		public static Exception UnhandledBindingType(MemberBindingType bindingType)
+		{
+			return new InvalidOperationException(String.Format(Strings.UnhandledBindingType, bindingType));
+		}
 
-	    public static Exception UnableToResolveRootForType(Type type)
-	    {
-			return new InvalidOperationException("UnableToResolveRootForType: " + type + ".");
-	    }
+		public static Exception UnableToResolveRootForType(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception CouldNotDetermineDbGeneratedSqlType(Type type)
-	    {
-			return new InvalidOperationException("CouldNotDetermineDbGeneratedSqlType: " + type + ".");
-	    }
+		public static Exception CouldNotDetermineDbGeneratedSqlType(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception IncludeCycleNotAllowed()
-	    {
-			return new InvalidOperationException("IncludeCycleNotAllowed");
-	    }
+		public static Exception IncludeCycleNotAllowed()
+		{
+			return new InvalidOperationException(Strings.IncludeCycleNotAllowed);
+		}
 
-	    public static Exception InvalidGroupByExpression()
-	    {
-			return new InvalidOperationException("InvalidGroupByExpression");
-	    }
+		public static Exception InvalidGroupByExpression()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception ExpectedEmptyElement(string nodeName, XmlNodeType nodeType, string name)
-	    {
-			return new InvalidOperationException("ExpectedEmptyElement: " + nodeName + ", " + nodeType + ", " + name + ".");
-	    }
+		public static Exception ExpectedEmptyElement(string nodeName, XmlNodeType nodeType, string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { nodeName, nodeType, name }));
+		}
 
-	    public static Exception InvalidOrderByExpression(string toQueryString)
-	    {
-			return new InvalidOperationException("InvalidOrderByExpression: " + toQueryString + ".");
-	    }
+		public static Exception InvalidOrderByExpression(string toQueryString)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { toQueryString }));
+		}
 
-	    public static Exception SubqueryNotSupportedOn(MemberInfo mi)
-	    {
-			return new InvalidOperationException("SubqueryNotSupportedOn: " + mi + ".");
-	    }
+		public static Exception SubqueryNotSupportedOn(MemberInfo mi)
+		{
+			return new InvalidOperationException(String.Format(Strings.SubqueryNotSupportedOn, mi));
+		}
 
-	    public static Exception SubqueryNotSupportedOnType(string name, Type declaringType)
-	    {
-			return new InvalidOperationException("SubqueryNotSupportedOnType: " + name + ", " + declaringType + ".");
-	    }
+		public static Exception SubqueryNotSupportedOnType(string name, Type declaringType)
+		{
+			return new InvalidOperationException(String.Format(Strings.SubqueryNotSupportedOnType, name, declaringType));
+		}
 
-	    public static Exception SubqueryMustBeSequence()
-	    {
-			return new InvalidOperationException("SubqueryMustBeSequence");
-	    }
+		public static Exception SubqueryMustBeSequence()
+		{
+			return new InvalidOperationException(Strings.SubqueryMustBeSequence);
+		}
 
-	    public static Exception RefreshOfDeletedObject()
-	    {
-			return new InvalidOperationException("RefreshOfDeletedObject");
-	    }
+		public static Exception RefreshOfDeletedObject()
+		{
+			return new InvalidOperationException(Strings.RefreshOfDeletedObject);
+		}
 
-	    public static Exception OptionsCannotBeModifiedAfterQuery()
-	    {
-			return new InvalidOperationException("OptionsCannotBeModifiedAfterQuery");
-	    }
+		public static Exception OptionsCannotBeModifiedAfterQuery()
+		{
+			return new InvalidOperationException(Strings.OptionsCannotBeModifiedAfterQuery);
+		}
 
-	    public static Exception SubqueryDoesNotSupportOperator(string name)
-	    {
-			return new InvalidOperationException("SubqueryDoesNotSupportOperator: " + name + ".");
-	    }
+		public static Exception SubqueryDoesNotSupportOperator(string name)
+		{
+			return new InvalidOperationException(String.Format(Strings.SubqueryDoesNotSupportOperator, name));
+		}
 
-	    public static Exception EntityRefAlreadyLoaded()
-	    {
-			return new InvalidOperationException("EntityRefAlreadyLoaded");
-	    }
+		public static Exception EntityRefAlreadyLoaded()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception InvalidReferenceToRemovedAliasDuringDeflation()
-	    {
-			return new InvalidOperationException("InvalidReferenceToRemovedAliasDuringDeflation");
-	    }
+		public static Exception InvalidReferenceToRemovedAliasDuringDeflation()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception ColumnIsNotAccessibleThroughDistinct(string getColumnName)
-	    {
-			return new InvalidOperationException("ColumnIsNotAccessibleThroughDistinct: " + getColumnName + ".");
-	    }
+		public static Exception ColumnIsNotAccessibleThroughDistinct(string getColumnName)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { getColumnName }));
+		}
 
-	    public static Exception UnrecognizedElement(string format)
-	    {
-			return new InvalidOperationException("UnrecognizedElement: " + format + ".");
-	    }
+		public static Exception UnrecognizedElement(string format)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { format }));
+		}
 
-	    public static Exception UnexpectedElement(string database, string format)
-	    {
-			return new InvalidOperationException("UnexpectedElement: " + database + ", " + format + ".");
-	    }
+		public static Exception UnexpectedElement(string database, string format)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { database, format }));
+		}
 
-	    public static Exception ColumnIsNotAccessibleThroughGroupBy(string getColumnName)
-	    {
-			return new InvalidOperationException("ColumnIsNotAccessibleThroughGroupBy: " + getColumnName + ".");
-	    }
+		public static Exception ColumnIsNotAccessibleThroughGroupBy(string getColumnName)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { getColumnName }));
+		}
 
-	    public static Exception CouldNotDetermineSqlType(Type type)
-	    {
-			return new InvalidOperationException("CouldNotDetermineSqlType: " + type + ".");
-	    }
+		public static Exception CouldNotDetermineSqlType(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception DeferredLoadingRequiresObjectTracking()
-	    {
-			return new InvalidOperationException("DeferredLoadingRequiresObjectTracking");
-	    }
+		public static Exception DeferredLoadingRequiresObjectTracking()
+		{
+			return new InvalidOperationException(Strings.DeferredLoadingRequiresObjectTracking);
+		}
 
-	    public static Exception IQueryableCannotReturnSelfReferencingConstantExpression()
-	    {
-			return new InvalidOperationException("IQueryableCannotReturnSelfReferencingConstantExpression");
-	    }
+		public static Exception IQueryableCannotReturnSelfReferencingConstantExpression()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CapturedValuesCannotBeSequences()
-	    {
-			return new InvalidOperationException("CapturedValuesCannotBeSequences");
-	    }
+		public static Exception CapturedValuesCannotBeSequences()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception ConstructedArraysNotSupported()
-	    {
-			return new InvalidOperationException("ConstructedArraysNotSupported");
-	    }
+		public static Exception ConstructedArraysNotSupported()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception ParametersCannotBeSequences()
-	    {
-			return new InvalidOperationException("ParametersCannotBeSequences");
-	    }
+		public static Exception ParametersCannotBeSequences()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception UnrecognizedAttribute(string format)
-	    {
-			return new InvalidOperationException("UnrecognizedAttribute: " + format + ".");
-	    }
+		public static Exception UnrecognizedAttribute(string format)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { format }));
+		}
 
-	    public static Exception CannotCompareItemsAssociatedWithDifferentTable()
-	    {
-			return new InvalidOperationException("CannotCompareItemsAssociatedWithDifferentTable");
-	    }
+		public static Exception CannotCompareItemsAssociatedWithDifferentTable()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception ObjectTrackingRequired()
-	    {
-			return new InvalidOperationException("ObjectTrackingRequired");
-	    }
+		public static Exception ObjectTrackingRequired()
+		{
+			return new InvalidOperationException(Strings.ObjectTrackingRequired);
+		}
 
-	    public static Exception QueryWasCompiledForDifferentMappingSource()
-	    {
-			return new InvalidOperationException("QueryWasCompiledForDifferentMappingSource");
-	    }
+		public static Exception QueryWasCompiledForDifferentMappingSource()
+		{
+			return new InvalidOperationException(Strings.QueryWasCompiledForDifferentMappingSource);
+		}
 
-	    public static Exception ContextNotInitialized()
-	    {
-			return new InvalidOperationException("ContextNotInitialized");
-	    }
+		public static Exception ContextNotInitialized()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception IifReturnTypesMustBeEqual(string name, string s)
-	    {
-			return new InvalidOperationException("IifReturnTypesMustBeEqual: " + name + ", " + s + ".");
-	    }
+		public static Exception IifReturnTypesMustBeEqual(string name, string s)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name, s }));
+		}
 
-	    public static Exception UnionWithHierarchy()
-	    {
-			return new InvalidOperationException("UnionWithHierarchy");
-	    }
+		public static Exception UnionWithHierarchy()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception DatabaseDeleteThroughContext()
-	    {
-			return new InvalidOperationException("DatabaseDeleteThroughContext");
-	    }
+		public static Exception DatabaseDeleteThroughContext()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CannotPerformOperationDuringSubmitChanges()
-	    {
-			return new InvalidOperationException("CannotPerformOperationDuringSubmitChanges");
-	    }
+		public static Exception CannotPerformOperationDuringSubmitChanges()
+		{
+			return new InvalidOperationException(Strings.CannotPerformOperationDuringSubmitChanges);
+		}
 
-	    public static Exception ArgumentWrongType(object x, object y, object z)
-	    {
-			return new InvalidOperationException("ArgumentWrongType: " + x + ", " + y + ", " + z + ".");
-	    }
+		public static Exception ArgumentWrongType(object x, object y, object z)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x, y, z }));
+		}
 
-	    public static Exception IdentityChangeNotAllowed(string name, string s)
-	    {
-			return new InvalidOperationException("IdentityChangeNotAllowed: " + name + ", " + s + ".");
-	    }
+		public static Exception IdentityChangeNotAllowed(string name, string s)
+		{
+			return new InvalidOperationException(String.Format(Strings.IdentityChangeNotAllowed, name, s));
+		}
 
-	    public static Exception CannotPerformOperationOutsideSubmitChanges()
-	    {
-			return new InvalidOperationException("CannotPerformOperationOutsideSubmitChanges");
-	    }
+		public static Exception CannotPerformOperationOutsideSubmitChanges()
+		{
+			return new InvalidOperationException(Strings.CannotPerformOperationOutsideSubmitChanges);
+		}
 
-	    public static Exception DbGeneratedChangeNotAllowed(string name, string s)
-	    {
-			return new InvalidOperationException("DbGeneratedChangeNotAllowed: " + name + ", " + s + ".");
-	    }
+		public static Exception DbGeneratedChangeNotAllowed(string name, string s)
+		{
+			return new InvalidOperationException(String.Format(Strings.DbGeneratedChangeNotAllowed, name, s));
+		}
 
-	    public static Exception ProviderNotInstalled(string dbName, string sqlCeProviderInvariantName)
-	    {
-			return new InvalidOperationException("ProviderNotInstalled: " + dbName + ", " + sqlCeProviderInvariantName + ".");
-	    }
+		public static Exception ProviderNotInstalled(string dbName, string sqlCeProviderInvariantName)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { dbName, sqlCeProviderInvariantName }));
+		}
 
 		public static Exception ProviderNotSupported(string dbName, string sqlProviderInvariantName)
 		{
-			return new InvalidOperationException("ProviderNotSupported: " + dbName + ", " + sqlProviderInvariantName + ".");
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { dbName, sqlProviderInvariantName }));
 		}
 
 		public static Exception ComparisonNotSupportedForType(Type clrType)
-	    {
-			return new InvalidOperationException("ComparisonNotSupportedForType: " + clrType + ".");
-	    }
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { clrType }));
+		}
 
-	    public static Exception TypeIsNotMarkedAsTable(Type type)
-	    {
-			return new InvalidOperationException("TypeIsNotMarkedAsTable: " + type + ".");
-	    }
+		public static Exception TypeIsNotMarkedAsTable(Type type)
+		{
+			return new InvalidOperationException(String.Format(Strings.TypeIsNotMarkedAsTable, type));
+		}
 
-	    public static Exception CouldNotGetTableForSubtype(Type type, Type type1)
-	    {
-			return new InvalidOperationException("CouldNotGetTableForSubtype: " + type + ", " + type1 + ".");
-	    }
+		public static Exception CouldNotGetTableForSubtype(Type type, Type type1)
+		{
+			return new InvalidOperationException(String.Format(Strings.CouldNotGetTableForSubtype, type, type1));
+		}
 
-	    public static Exception BadParameterType(Type type)
-	    {
-			return new InvalidOperationException("BadParameterType: " + type + ".");
-	    }
+		public static Exception BadParameterType(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception InvalidConnectionArgument(string connection)
-	    {
-			return new InvalidOperationException("InvalidConnectionArgument: " + connection + ".");
-	    }
+		public static Exception InvalidConnectionArgument(string connection)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { connection }));
+		}
 
-	    public static Exception NoDiscriminatorFound(object x)
-	    {
-			return new InvalidOperationException("NoDiscriminatorFound: " + x + ".");
-	    }
+		public static Exception NoDiscriminatorFound(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
-	    public static Exception DiscriminatorClrTypeNotSupported(string name, string s, Type type)
-	    {
-			return new InvalidOperationException("DiscriminatorClrTypeNotSupported: " + name + ", " + s + ", " + type + ".");
-	    }
+		public static Exception DiscriminatorClrTypeNotSupported(string name, string s, Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name, s, type }));
+		}
 
-	    public static Exception NonEntityAssociationMapping(Type type, string name, Type p2)
-	    {
-			return new InvalidOperationException("NonEntityAssociationMapping: " + type + ", " + name + ", " + p2 + ".");
-	    }
+		public static Exception NonEntityAssociationMapping(Type type, string name, Type p2)
+		{
+			return new InvalidOperationException(String.Format(Strings.NonEntityAssociationMapping, type, name, p2));
+		}
 
-	    public static Exception InheritanceTypeDoesNotDeriveFromRoot(Type type, Type type1)
-	    {
-			return new InvalidOperationException("InheritanceTypeDoesNotDeriveFromRoot: " + type + ", " + type1 + ".");
-	    }
+		public static Exception InheritanceTypeDoesNotDeriveFromRoot(Type type, Type type1)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type, type1 }));
+		}
 
-	    public static Exception AbstractClassAssignInheritanceDiscriminator(Type type)
-	    {
-			return new InvalidOperationException("AbstractClassAssignInheritanceDiscriminator: " + type + ".");
-	    }
+		public static Exception AbstractClassAssignInheritanceDiscriminator(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception InheritanceCodeMayNotBeNull()
-	    {
-			return new InvalidOperationException("InheritanceCodeMayNotBeNull");
-	    }
+		public static Exception InheritanceCodeMayNotBeNull()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception InheritanceTypeHasMultipleDiscriminators(object x)
-	    {
-			return new InvalidOperationException("InheritanceTypeHasMultipleDiscriminators: " + x + ".");
-	    }
+		public static Exception InheritanceTypeHasMultipleDiscriminators(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
-	    public static Exception InheritanceTypeNotRegistered(object x)
-	    {
-		    return new InvalidOperationException("InheritanceTypeNotRegistered: " + x + ".");
-	    }
+		public static Exception InheritanceTypeNotRegistered(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
-	    public static Exception InheritanceCodeUsedForMultipleTypes(object codeValue)
-	    {
-			return new InvalidOperationException("InheritanceCodeUsedForMultipleTypes: " + codeValue + ".");
-	    }
+		public static Exception InheritanceCodeUsedForMultipleTypes(object codeValue)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { codeValue }));
+		}
 
-	    public static Exception InheritanceTypeHasMultipleDefaults(object x)
-	    {
-			return new InvalidOperationException("InheritanceTypeHasMultipleDefaults: " + x + ".");
-	    }
+		public static Exception InheritanceTypeHasMultipleDefaults(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
-	    public static Exception InheritanceHierarchyDoesNotDefineDefault(Type type)
-	    {
-			return new InvalidOperationException("InheritanceHierarchyDoesNotDefineDefault: " + type + ".");
-	    }
+		public static Exception InheritanceHierarchyDoesNotDefineDefault(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception BadProjectionInSelect()
-	    {
-			return new InvalidOperationException("BadProjectionInSelect");
-	    }
+		public static Exception BadProjectionInSelect()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception EntitySetAlreadyLoaded()
-	    {
-			return new InvalidOperationException("EntitySetAlreadyLoaded");
-	    }
+		public static Exception EntitySetAlreadyLoaded()
+		{
+			return new InvalidOperationException(Strings.EntitySetAlreadyLoaded);
+		}
 
-	    public static Exception NonInheritanceClassHasDiscriminator(MetaType type)
-	    {
-			return new InvalidOperationException("NonInheritanceClassHasDiscriminator: " + type + ".");
-	    }
+		public static Exception NonInheritanceClassHasDiscriminator(MetaType type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception InheritanceSubTypeIsAlsoRoot(Type type)
-	    {
-			return new InvalidOperationException("InheritanceSubTypeIsAlsoRoot: " + type + ".");
-	    }
+		public static Exception InheritanceSubTypeIsAlsoRoot(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception ModifyDuringAddOrRemove()
-	    {
-			return new InvalidOperationException("ModifyDuringAddOrRemove");
-	    }
+		public static Exception ModifyDuringAddOrRemove()
+		{
+			return new InvalidOperationException(Strings.ModifyDuringAddOrRemove);
+		}
 
-	    public static Exception MemberMappedMoreThanOnce(string name)
-	    {
-			return new InvalidAsynchronousStateException("MemberMappedMoreThanOnce: " + name + ".");
-	    }
+		public static Exception MemberMappedMoreThanOnce(string name)
+		{
+			return new InvalidAsynchronousStateException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception ProviderCannotBeUsedAfterDispose()
-	    {
-			return new InvalidOperationException("ProviderCannotBeUsedAfterDispose");
-	    }
+		public static Exception ProviderCannotBeUsedAfterDispose()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CouldNotFindRuntimeTypeForMapping(string name)
-	    {
-			return new InvalidOperationException("CouldNotFindRuntimeTypeForMapping: " + name + ".");
-	    }
+		public static Exception CouldNotFindRuntimeTypeForMapping(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception EntitySetModifiedDuringEnumeration()
-	    {
-			return new InvalidOperationException("EntitySetModifiedDuringEnumeration");
-	    }
+		public static Exception EntitySetModifiedDuringEnumeration()
+		{
+			return new InvalidOperationException(Strings.EntitySetModifiedDuringEnumeration);
+		}
 
-	    public static Exception CreateDatabaseFailedBecauseSqlCEDatabaseAlreadyExists(string dbName)
-	    {
-			return new InvalidOperationException("CreateDatabaseFailedBecauseSqlCEDatabaseAlreadyExists: " + dbName + ".");
-	    }
+		public static Exception CreateDatabaseFailedBecauseSqlCEDatabaseAlreadyExists(string dbName)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { dbName }));
+		}
 
-	    public static Exception PrimaryKeyInSubTypeNotSupported(string name, string s)
-	    {
-			return new InvalidOperationException("PrimaryKeyInSubTypeNotSupported: " + name + ", " + s + ".");
-	    }
+		public static Exception PrimaryKeyInSubTypeNotSupported(string name, string s)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name, s }));
+		}
 
-	    public static Exception SqlMethodOnlyForSql(MethodBase getCurrentMethod)
-	    {
-			return new InvalidOperationException("SqlMethodOnlyForSql: " + getCurrentMethod + ".");
-	    }
+		public static Exception SqlMethodOnlyForSql(MethodBase getCurrentMethod)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { getCurrentMethod }));
+		}
 
-	    public static Exception InconsistentAssociationAndKeyChange(string name, string s)
-	    {
-			return new InvalidOperationException("InconsistentAssociationAndKeyChange: " + name + ", " + s + ".");
-	    }
+		public static Exception InconsistentAssociationAndKeyChange(string name, string s)
+		{
+			return new InvalidOperationException(String.Format(Strings.InconsistentAssociationAndKeyChange, name, s));
+		}
 
-	    public static Exception CouldNotDetermineCatalogName()
-	    {
-			return new InvalidOperationException("CouldNotDetermineCatalogName");
-	    }
+		public static Exception CouldNotDetermineCatalogName()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception UnrecognizedRefreshObject()
-	    {
-			return new InvalidAsynchronousStateException("UnrecognizedRefreshObject");
-	    }
+		public static Exception UnrecognizedRefreshObject()
+		{
+			return new InvalidAsynchronousStateException(Strings.UnrecognizedRefreshObject);
+		}
 
-	    public static Exception CouldNotRemoveRelationshipBecauseOneSideCannotBeNull(string name, string s, StringBuilder keys)
-	    {
+		public static Exception CouldNotRemoveRelationshipBecauseOneSideCannotBeNull(string name, string s, StringBuilder keys)
+		{
 			return new InvalidOperationException(
-				"CouldNotRemoveRelationshipBecauseOneSideCannotBeNull: " + name + ", " + s + ", " + keys + ".");
-	    }
+				Strings.DefaultErrorMessage(new object[] { name, s, keys }));
+		}
 
-	    public static Exception CreateDatabaseFailedBecauseOfContextWithNoTables(string databaseName)
-	    {
-			return new InvalidOperationException("CreateDatabaseFailedBecauseOfContextWithNoTables: " + databaseName + ".");
-	    }
+		public static Exception CreateDatabaseFailedBecauseOfContextWithNoTables(string databaseName)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { databaseName }));
+		}
 
-	    public static Exception RefreshOfNewObject()
-	    {
-			return new InvalidOperationException("RefreshOfNewObject");
-	    }
+		public static Exception RefreshOfNewObject()
+		{
+			return new InvalidOperationException(Strings.RefreshOfNewObject);
+		}
 
-	    public static Exception TypeBinaryOperatorNotRecognized()
-	    {
-			return new InvalidAsynchronousStateException("TypeBinaryOperatorNotRecognized");
-	    }
+		public static Exception TypeBinaryOperatorNotRecognized()
+		{
+			return new InvalidAsynchronousStateException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CannotChangeInheritanceType(
+		public static Exception CannotChangeInheritanceType(
 			object dbDiscriminator,
 			object currentDiscriminator,
 			string name,
 			MetaType currentTypeFromDiscriminator)
-	    {
-			return new InvalidOperationException("CannotChangeInheritanceType: " + dbDiscriminator + ", " +
-				currentDiscriminator + ", " + name + ", " + currentTypeFromDiscriminator + ".");
-	    }
+		{
+			return new InvalidOperationException(String.Format(Strings.CannotChangeInheritanceType, dbDiscriminator + ", " +
+				currentDiscriminator, name, currentTypeFromDiscriminator));
+		}
 
-	    public static Exception DidNotExpectTypeBinding()
-	    {
-			return new InvalidOperationException("DidNotExpectTypeBinding");
-	    }
+		public static Exception DidNotExpectTypeBinding()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception DidNotExpectAs(UnaryExpression unaryExpression)
-	    {
-			return new InvalidOperationException("DidNotExpectAs: " + unaryExpression + ".");
-	    }
+		public static Exception DidNotExpectAs(UnaryExpression unaryExpression)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { unaryExpression }));
+		}
 
-	    public static Exception CycleDetected()
-	    {
-			return new InvalidOperationException("CycleDetected");
-	    }
+		public static Exception CycleDetected()
+		{
+			return new InvalidOperationException(Strings.CycleDetected);
+		}
 
-	    public static Exception TwoMembersMarkedAsPrimaryKeyAndDBGenerated(MemberInfo member, MemberInfo memberInfo)
-	    {
+		public static Exception TwoMembersMarkedAsPrimaryKeyAndDBGenerated(MemberInfo member, MemberInfo memberInfo)
+		{
 			return new InvalidOperationException(
-				"TwoMembersMarkedAsPrimaryKeyAndDBGenerated: " + member + ", " + memberInfo + ".");
-	    }
+				Strings.DefaultErrorMessage(new object[] { member, memberInfo }));
+		}
 
-	    public static Exception IdentityClrTypeNotSupported(MetaType declaringType, string name, Type type)
-	    {
+		public static Exception IdentityClrTypeNotSupported(MetaType declaringType, string name, Type type)
+		{
 			return new InvalidOperationException(
-				"IdentityClrTypeNotSupported: " + declaringType + ", " + name + ", " + type + ".");
-	    }
+				Strings.DefaultErrorMessage(new object[] { declaringType, name, type }));
+		}
 
-	    public static Exception TwoMembersMarkedAsRowVersion(MemberInfo member, MemberInfo memberInfo)
-	    {
-			return new InvalidAsynchronousStateException("TwoMembersMarkedAsRowVersion: " + member + ", " + memberInfo + ".");
-	    }
+		public static Exception TwoMembersMarkedAsRowVersion(MemberInfo member, MemberInfo memberInfo)
+		{
+			return new InvalidAsynchronousStateException(Strings.DefaultErrorMessage(new object[] { member, memberInfo }));
+		}
 
-	    public static Exception TwoMembersMarkedAsInheritanceDiscriminator(MemberInfo member, MemberInfo memberInfo)
-	    {
+		public static Exception TwoMembersMarkedAsInheritanceDiscriminator(MemberInfo member, MemberInfo memberInfo)
+		{
 			return new InvalidOperationException(
-				"TwoMembersMarkedAsInheritanceDiscriminator: " + member + ", " + memberInfo + ".");
-	    }
+				Strings.DefaultErrorMessage(new object[] { member, memberInfo }));
+		}
 
-	    public static Exception MappedMemberHadNoCorrespondingMemberInType(string memberName, string name)
-	    {
-			return new InvalidOperationException("MappedMemberHadNoCorrespondingMemberInType: " + memberName + ", " + name + ".");
-	    }
+		public static Exception MappedMemberHadNoCorrespondingMemberInType(string memberName, string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { memberName, name }));
+		}
 
-	    public static Exception ExpectedClrTypesToAgree(Type newClrType, Type clrType)
-	    {
-			return new InvalidOperationException("ExpectedClrTypesToAgree: " + newClrType + ", " + clrType + ".");
-	    }
+		public static Exception ExpectedClrTypesToAgree(Type newClrType, Type clrType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { newClrType, clrType }));
+		}
 
-	    public static Exception UnsupportedStringConstructorForm()
-	    {
-			return new InvalidOperationException("UnsupportedStringConstructorForm");
-	    }
+		public static Exception UnsupportedStringConstructorForm()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CouldNotGetClrType()
-	    {
-			return new InvalidOperationException("CouldNotGetClrType");
-	    }
+		public static Exception CouldNotGetClrType()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CouldNotGetSqlType()
-	    {
-			return new InvalidOperationException("CouldNotGetSqlType");
-	    }
+		public static Exception CouldNotGetSqlType()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception VbLikeDoesNotSupportMultipleCharacterRanges()
-	    {
-			return new InvalidOperationException("VbLikeDoesNotSupportMultipleCharacterRanges");
-	    }
+		public static Exception VbLikeDoesNotSupportMultipleCharacterRanges()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CouldNotTranslateExpressionForReading(Expression sourceExpression)
-	    {
-			return new InvalidOperationException("CouldNotTranslateExpressionForReading: " + sourceExpression + ".");
-	    }
+		public static Exception CouldNotTranslateExpressionForReading(Expression sourceExpression)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { sourceExpression }));
+		}
 
-	    public static Exception UnsupportedDateTimeConstructorForm()
-	    {
-			return new InvalidOperationException("UnsupportedDateTimeConstructorForm");
-	    }
+		public static Exception UnsupportedDateTimeConstructorForm()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception WrongDataContext()
-	    {
-			return new InvalidOperationException("WrongDataContext");
-	    }
+		public static Exception WrongDataContext()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CannotGetInheritanceDefaultFromNonInheritanceClass()
-	    {
-			return new InvalidOperationException("CannotGetInheritanceDefaultFromNonInheritanceClass");
-	    }
+		public static Exception CannotGetInheritanceDefaultFromNonInheritanceClass()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception MappingOfInterfacesMemberIsNotSupported(string name, string s)
-	    {
-			return new InvalidOperationException("MappingOfInterfacesMemberIsNotSupported: " + name + ", " + s + ".");
-	    }
+		public static Exception MappingOfInterfacesMemberIsNotSupported(string name, string s)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name, s }));
+		}
 
-	    public static Exception UnmappedClassMember(string name, string s)
-	    {
-			return new InvalidOperationException("UnmappedClassMember: " + name + ", " + s + ".");
-	    }
+		public static Exception UnmappedClassMember(string name, string s)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name, s }));
+		}
 
-	    public static Exception CannotMaterializeEntityType(Type type)
-	    {
-			return new InvalidOperationException("CannotMaterializeEntityType: " + type + ".");
-	    }
+		public static Exception CannotMaterializeEntityType(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception CannotPerformOperationForUntrackedObject()
-	    {
-			return new InvalidOperationException("CannotPerformOperationForUntrackedObject");
-	    }
+		public static Exception CannotPerformOperationForUntrackedObject()
+		{
+			return new InvalidOperationException(Strings.CannotPerformOperationForUntrackedObject);
+		}
 
-	    public static Exception VbLikeUnclosedBracket()
-	    {
-			return new InvalidOperationException("VbLikeUnclosedBracket");
-	    }
+		public static Exception VbLikeUnclosedBracket()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception UnsupportedDateTimeOffsetConstructorForm()
-	    {
-			return new InvalidOperationException("UnsupportedDateTimeOffsetConstructorForm");
-	    }
+		public static Exception UnsupportedDateTimeOffsetConstructorForm()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception MemberNotPartOfProjection(Type declaringType, string name)
-	    {
-			return new InvalidOperationException("MemberNotPartOfProjection: " + declaringType + ", " + name + ".");
-	    }
+		public static Exception MemberNotPartOfProjection(Type declaringType, string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { declaringType, name }));
+		}
 
-	    public static Exception CannotMaterializeList(Type clrType)
-	    {
-			return new InvalidOperationException("CannotMaterializeList: " + clrType + ".");
-	    }
+		public static Exception CannotMaterializeList(Type clrType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { clrType }));
+		}
 
-	    public static Exception InvalidProviderType(string typeName)
-	    {
-			return new InvalidOperationException("InvalidProviderType: " + typeName + ".");
-	    }
+		public static Exception InvalidProviderType(string typeName)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { typeName }));
+		}
 
-	    public static Exception NoResultTypesDeclaredForFunction(string name)
-	    {
-			return new InvalidOperationException("NoResultTypesDeclaredForFunction: " + name + ".");
-	    }
+		public static Exception NoResultTypesDeclaredForFunction(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception TooManyResultTypesDeclaredForFunction(string name)
-	    {
-			return new InvalidOperationException("TooManyResultTypesDeclaredForFunction: " + name + ".");
-	    }
+		public static Exception TooManyResultTypesDeclaredForFunction(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception UnsupportedTimeSpanConstructorForm()
-	    {
-			return new InvalidOperationException("UnsupportedTimeSpanConstructorForm");
-	    }
+		public static Exception UnsupportedTimeSpanConstructorForm()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CouldNotConvertToPropertyOrField(MemberInfo mi)
-	    {
-			return new InvalidOperationException("CouldNotConvertToPropertyOrField: " + mi + ".");
-	    }
+		public static Exception CouldNotConvertToPropertyOrField(MemberInfo mi)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { mi }));
+		}
 
-	    public static Exception LoadOptionsChangeNotAllowedAfterQuery()
-	    {
-			return new InvalidOperationException("LoadOptionsChangeNotAllowedAfterQuery");
-	    }
+		public static Exception LoadOptionsChangeNotAllowedAfterQuery()
+		{
+			return new InvalidOperationException(Strings.LoadOptionsChangeNotAllowedAfterQuery);
+		}
 
-	    public static Exception ToStringOnlySupportedForPrimitiveTypes()
-	    {
-			return new InvalidOperationException("ToStringOnlySupportedForPrimitiveTypes");
-	    }
+		public static Exception ToStringOnlySupportedForPrimitiveTypes()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception BadStorageProperty(string storageMemberName, Type declaringType, string name)
-	    {
+		public static Exception BadStorageProperty(string storageMemberName, Type declaringType, string name)
+		{
 			return new InvalidOperationException(
-				"BadStorageProperty: " + storageMemberName + ", " + declaringType + ", " + name + ".");
-	    }
+				Strings.DefaultErrorMessage(new object[] { storageMemberName, declaringType, name }));
+		}
 
-	    public static Exception IncorrectAutoSyncSpecification(string name)
-	    {
-			return new InvalidOperationException("IncorrectAutoSyncSpecification: " + name + ".");
-	    }
+		public static Exception IncorrectAutoSyncSpecification(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception MethodFormHasNoSupportConversionToSql(string name, MethodInfo method)
-	    {
-			return new InvalidOperationException("MethodFormHasNoSupportConversionToSql: " + name + ", " + method + ".");
-	    }
+		public static Exception MethodFormHasNoSupportConversionToSql(string name, MethodInfo method)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name, method }));
+		}
 
-	    public static Exception UnmappedDataMember(MemberInfo mi, Type declaringType, MetaType type)
-	    {
-			return new InvalidOperationException("UnmappedDataMember: " + mi + ", " + declaringType + ", " + type + ".");
-	    }
+		public static Exception UnmappedDataMember(MemberInfo mi, Type declaringType, MetaType type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { mi, declaringType, type }));
+		}
 
-	    public static Exception DeferredMemberWrongType()
-	    {
-			return new InvalidOperationException("DeferredMemberWrongType");
-	    }
+		public static Exception DeferredMemberWrongType()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception SkipNotSupportedForSequenceTypes()
-	    {
-			return new InvalidOperationException("SkipNotSupportedForSequenceTypes");
-	    }
+		public static Exception SkipNotSupportedForSequenceTypes()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CannotAssignToMember(string name)
-	    {
-			return new InvalidOperationException("CannotAssignToMember: " + name + ".");
-	    }
+		public static Exception CannotAssignToMember(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception SkipRequiresSingleTableQueryWithPKs()
-	    {
-			return new InvalidOperationException("SkipRequiresSingleTableQueryWithPKs");
-	    }
+		public static Exception SkipRequiresSingleTableQueryWithPKs()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception ParameterNotInScope(string name)
-	    {
-			return new InvalidOperationException("ParameterNotInScope: " + name + ".");
-	    }
+		public static Exception ParameterNotInScope(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception SprocsCannotBeComposed()
-	    {
-			return new InvalidOperationException("SprocsCannotBeComposed");
-	    }
+		public static Exception SprocsCannotBeComposed()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception InvalidReturnFromSproc(Type returnType)
-	    {
-			return new InvalidOperationException("InvalidReturnFromSproc: " + returnType + ".");
-	    }
+		public static Exception InvalidReturnFromSproc(Type returnType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { returnType }));
+		}
 
-	    public static Exception UnhandledDeferredStorageType(Type type)
-	    {
-			return new InvalidOperationException("UnhandledDeferredStorageType: " + type + ".");
-	    }
+		public static Exception UnhandledDeferredStorageType(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception TypeCouldNotBeAdded(Type type)
-	    {
-			return new InvalidOperationException("TypeCouldNotBeAdded: " + type + ".");
-	    }
+		public static Exception TypeCouldNotBeAdded(Type type)
+		{
+			return new InvalidOperationException(String.Format(Strings.TypeCouldNotBeAdded, type));
+		}
 
-	    public static Exception ConvertToDateTimeOnlyForDateTimeOrString()
-	    {
-			return new InvalidOperationException("ConvertToDateTimeOnlyForDateTimeOrString");
-	    }
+		public static Exception ConvertToDateTimeOnlyForDateTimeOrString()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception MismatchedThisKeyOtherKey(string name, string s)
-	    {
-			return new InvalidOperationException("MismatchedThisKeyOtherKey: " + name + ", " + s + ".");
-	    }
+		public static Exception MismatchedThisKeyOtherKey(string name, string s)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name, s }));
+		}
 
-	    public static Exception CantAddAlreadyExistingItem()
-	    {
-			return new InvalidOperationException("CantAddAlreadyExistingItem");
-	    }
+		public static Exception CantAddAlreadyExistingItem()
+		{
+			return new InvalidOperationException(Strings.CantAddAlreadyExistingItem);
+		}
 
-	    public static Exception DidNotExpectTypeChange(Type clrType, Type type)
-	    {
-			return new InvalidAsynchronousStateException("DidNotExpectTypeChange: " + clrType + ", " + type + ".");
-	    }
+		public static Exception DidNotExpectTypeChange(Type clrType, Type type)
+		{
+			return new InvalidAsynchronousStateException(Strings.DefaultErrorMessage(new object[] { clrType, type }));
+		}
 
-	    public static Exception EntityIsTheWrongType()
-	    {
-			return new InvalidOperationException("EntityIsTheWrongType");
-	    }
+		public static Exception EntityIsTheWrongType()
+		{
+			return new InvalidOperationException(Strings.EntityIsTheWrongType);
+		}
 
-	    public static Exception UnexpectedNull(string metadatamember)
-	    {
-			return new InvalidOperationException("UnexpectedNull: " + metadatamember + ".");
-	    }
+		public static Exception UnexpectedNull(string metadatamember)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { metadatamember }));
+		}
 
-	    public static Exception InvalidDeleteOnNullSpecification(object x)
-	    {
-			return new InvalidOperationException("InvalidDeleteOnNullSpecification: " + x + ".");
-	    }
+		public static Exception InvalidDeleteOnNullSpecification(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
-	    public static Exception ValueHasNoLiteralInSql(object value)
-	    {
-			return new InvalidAsynchronousStateException("ValueHasNoLiteralInSql: " + value + ".");
-	    }
+		public static Exception ValueHasNoLiteralInSql(object value)
+		{
+			return new InvalidAsynchronousStateException(Strings.DefaultErrorMessage(new object[] { value }));
+		}
 
-	    public static Exception CannotRemoveUnattachedEntity()
-	    {
-			return new InvalidAsynchronousStateException("CannotRemoveUnattachedEntity");
-	    }
+		public static Exception CannotRemoveUnattachedEntity()
+		{
+			return new InvalidAsynchronousStateException(Strings.CannotRemoveUnattachedEntity);
+		}
 
-	    public static Exception CouldNotFindElementTypeInModel(string name)
-	    {
-			return new InvalidOperationException("CouldNotFindElementTypeInModel: " + name + ".");
-	    }
+		public static Exception CouldNotFindElementTypeInModel(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception BinaryOperatorNotRecognized(ExpressionType nodeType)
-	    {
-			return new InvalidOperationException("BinaryOperatorNotRecognized: " + nodeType + ".");
-	    }
+		public static Exception BinaryOperatorNotRecognized(ExpressionType nodeType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { nodeType }));
+		}
 
-	    public static Exception IncorrectNumberOfParametersMappedForMethod(string methodName)
-	    {
-			return new InvalidOperationException("IncorrectNumberOfParametersMappedForMethod: " + methodName + ".");
-	    }
+		public static Exception IncorrectNumberOfParametersMappedForMethod(string methodName)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { methodName }));
+		}
 
-	    public static Exception TypeCouldNotBeTracked(Type type)
-	    {
-			return new InvalidOperationException("TypeCouldNotBeTracked: " + type + ".");
-	    }
+		public static Exception TypeCouldNotBeTracked(Type type)
+		{
+			return new InvalidOperationException(String.Format(Strings.TypeCouldNotBeTracked, type));
+		}
 
-	    public static Exception ExpressionNotDeferredQuerySource()
-	    {
-			return new InvalidOperationException("ExpressionNotDeferredQuerySource");
-	    }
+		public static Exception ExpressionNotDeferredQuerySource()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CannotAttachAsModifiedWithoutOriginalState()
-	    {
-			return new InvalidOperationException("CannotAttachAsModifiedWithoutOriginalState");
-	    }
+		public static Exception CannotAttachAsModifiedWithoutOriginalState()
+		{
+			return new InvalidOperationException(Strings.CannotAttachAsModifiedWithoutOriginalState);
+		}
 
-	    public static Exception IntersectNotSupportedForHierarchicalTypes()
-	    {
-			return new InvalidOperationException("IntersectNotSupportedForHierarchicalTypes");
-	    }
+		public static Exception IntersectNotSupportedForHierarchicalTypes()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CannotAttachAlreadyExistingEntity()
-	    {
-			return new InvalidOperationException("CannotAttachAlreadyExistingEntity");
-	    }
+		public static Exception CannotAttachAlreadyExistingEntity()
+		{
+			return new InvalidOperationException(Strings.CannotAttachAlreadyExistingEntity);
+		}
 
-	    public static Exception ExceptNotSupportedForHierarchicalTypes()
-	    {
-			return new InvalidOperationException("ExceptNotSupportedForHierarchicalTypes");
-	    }
+		public static Exception ExceptNotSupportedForHierarchicalTypes()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception SequenceOperatorsNotSupportedForType(Type clrType)
-	    {
-			return new InvalidOperationException("SequenceOperatorsNotSupportedForType: " + clrType + ".");
-	    }
+		public static Exception SequenceOperatorsNotSupportedForType(Type clrType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { clrType }));
+		}
 
-	    public static Exception MemberAccessIllegal(MemberInfo member, Type reflectedType, Type clrType)
-	    {
-			return new InvalidOperationException("MemberAccessIllegal: " + member + ", " + reflectedType + ", " + clrType + ".");
-	    }
+		public static Exception MemberAccessIllegal(MemberInfo member, Type reflectedType, Type clrType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { member, reflectedType, clrType }));
+		}
 
-	    public static Exception OriginalEntityIsWrongType()
-	    {
-			return new InvalidOperationException("OriginalEntityIsWrongType");
-	    }
+		public static Exception OriginalEntityIsWrongType()
+		{
+			return new InvalidOperationException(Strings.OriginalEntityIsWrongType);
+		}
 
-	    public static Exception QueryOnLocalCollectionNotSupported()
-	    {
-			return new InvalidOperationException("QueryOnLocalCollectionNotSupported");
-	    }
+		public static Exception QueryOnLocalCollectionNotSupported()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception GroupingNotSupportedAsOrderCriterion()
-	    {
-			return new InvalidOperationException("GroupingNotSupportedAsOrderCriterion");
-	    }
+		public static Exception GroupingNotSupportedAsOrderCriterion()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception TypeCannotBeOrdered(Type type)
-	    {
-			return new InvalidOperationException("TypeCannotBeOrdered: " + type + ".");
-	    }
+		public static Exception TypeCannotBeOrdered(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception BadKeyMember(string p0, string keyFields, string name)
-	    {
-			return new InvalidOperationException("BadKeyMember: " + p0 + ", " + keyFields + ", " + name + ".");
-	    }
+		public static Exception BadKeyMember(string p0, string keyFields, string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { p0, keyFields, name }));
+		}
 
-	    public static Exception NonConstantExpressionsNotSupportedFor(string stringContains)
-	    {
-			return new InvalidOperationException("NonConstantExpressionsNotSupportedFor: " + stringContains + ".");
-	    }
+		public static Exception NonConstantExpressionsNotSupportedFor(string stringContains)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { stringContains }));
+		}
 
-	    public static Exception ColumnCannotReferToItself()
-	    {
-			return new InvalidOperationException("ColumnCannotReferToItself");
-	    }
+		public static Exception ColumnCannotReferToItself()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception IndexOfWithStringComparisonArgNotSupported()
-	    {
-			return new InvalidOperationException("IndexOfWithStringComparisonArgNotSupported");
-	    }
+		public static Exception IndexOfWithStringComparisonArgNotSupported()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CannotPerformCUDOnReadOnlyTable(string toString)
-	    {
-			return new InvalidOperationException("CannotPerformCUDOnReadOnlyTable: " + toString + ".");
-	    }
+		public static Exception CannotPerformCUDOnReadOnlyTable(string toString)
+		{
+			return new InvalidOperationException(String.Format(Strings.CannotPerformCUDOnReadOnlyTable, toString));
+		}
 
-	    public static Exception CannotAggregateType(Type type)
-	    {
-			return new InvalidOperationException("CannotAggregateType: " + type + ".");
-	    }
+		public static Exception CannotAggregateType(Type type)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { type }));
+		}
 
-	    public static Exception CannotConvertToEntityRef(Type actualType)
-	    {
-			return new InvalidOperationException("CannotConvertToEntityRef: " + actualType + ".");
-	    }
+		public static Exception CannotConvertToEntityRef(Type actualType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { actualType }));
+		}
 
-	    public static Exception NonCountAggregateFunctionsAreNotValidOnProjections(SqlNodeType aggType)
-	    {
-			return new InvalidOperationException("NonCountAggregateFunctionsAreNotValidOnProjections: " + aggType + ".");
-	    }
+		public static Exception NonCountAggregateFunctionsAreNotValidOnProjections(SqlNodeType aggType)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { aggType }));
+		}
 
-	    public static Exception ArgumentTypeMismatch(string provider)
-	    {
-			return new InvalidOperationException("ArgumentTypeMismatch: " + provider + ".");
-	    }
+		public static Exception ArgumentTypeMismatch(string provider)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { provider }));
+		}
 
-	    public static Exception CompiledQueryAgainstMultipleShapesNotSupported()
-	    {
-			return new InvalidOperationException("CompiledQueryAgainstMultipleShapesNotSupported");
-	    }
+		public static Exception CompiledQueryAgainstMultipleShapesNotSupported()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception LastIndexOfWithStringComparisonArgNotSupported()
-	    {
-			return new InvalidOperationException("LastIndexOfWithStringComparisonArgNotSupported");
-	    }
+		public static Exception LastIndexOfWithStringComparisonArgNotSupported()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception GeneralCollectionMaterializationNotSupported()
-	    {
-			return new InvalidOperationException("GeneralCollectionMaterializationNotSupported");
-	    }
+		public static Exception GeneralCollectionMaterializationNotSupported()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception CannotEnumerateResultsMoreThanOnce()
-	    {
-			return new InvalidOperationException("CannotEnumerateResultsMoreThanOnce");
-	    }
+		public static Exception CannotEnumerateResultsMoreThanOnce()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception MathRoundNotSupported()
-	    {
-			return new InvalidOperationException("MathRoundNotSupported");
-	    }
+		public static Exception MathRoundNotSupported()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception NonConstantExpressionsNotSupportedForRounding()
-	    {
-			return new InvalidOperationException("NonConstantExpressionsNotSupportedForRounding");
-	    }
+		public static Exception NonConstantExpressionsNotSupportedForRounding()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception QueryOperatorOverloadNotSupported(string name)
-	    {
-			return new InvalidOperationException("QueryOperatorOverloadNotSupported: " + name + ".");
-	    }
+		public static Exception QueryOperatorOverloadNotSupported(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception QueryOperatorNotSupported(string name)
-	    {
-			return new InvalidOperationException("QueryOperatorNotSupported: " + name + ".");
-	    }
+		public static Exception QueryOperatorNotSupported(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception InvalidSequenceOperatorCall(object x)
-	    {
-			return new InvalidOperationException("InvalidSequenceOperatorCall: " + x + ".");
-	    }
+		public static Exception InvalidSequenceOperatorCall(object x)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { x }));
+		}
 
-	    public static Exception MemberCannotBeTranslated(Type declaringType, string name)
-	    {
-			return new InvalidOperationException("MemberCannotBeTranslated: " + declaringType + ", " + name + ".");
-	    }
+		public static Exception MemberCannotBeTranslated(Type declaringType, string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { declaringType, name }));
+		}
 
-	    public static Exception InsertItemMustBeConstant()
-	    {
-			return new InvalidOperationException("InsertItemMustBeConstant");
-	    }
+		public static Exception InsertItemMustBeConstant()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception InvalidDbGeneratedType(string toQueryString)
-	    {
-			return new InvalidOperationException("InvalidDbGeneratedType: " + toQueryString + ".");
-	    }
+		public static Exception InvalidDbGeneratedType(string toQueryString)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { toQueryString }));
+		}
 
-	    public static Exception UpdateItemMustBeConstant()
-	    {
-			return new InvalidOperationException("UpdateItemMustBeConstant");
-	    }
+		public static Exception UpdateItemMustBeConstant()
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage());
+		}
 
-	    public static Exception RequiredColumnDoesNotExist(string name)
-	    {
-			return new InvalidOperationException("RequiredColumnDoesNotExist: " + name + ".");
-	    }
+		public static Exception RequiredColumnDoesNotExist(string name)
+		{
+			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { name }));
+		}
 
-	    public static Exception NotSupported()
-	    {
-		    return new NotSupportedException();
-	    }
-    }
+		public static Exception NotSupported()
+		{
+			return new NotSupportedException();
+		}
+	}
 }

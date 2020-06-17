@@ -216,19 +216,6 @@ namespace System.Data.Linq.Mapping
 			return IsDeferredType(storageType);
 		}
 
-		internal virtual bool DoesMemberRequireProxy(
-			MemberInfo member, 
-			Type storageType, 
-			AssociationAttribute associationAttribute)
-		{
-			if (member == null)
-				throw new ArgumentNullException("member");
-			if (storageType == null)
-				throw new ArgumentNullException("storageType");
-
-			return false;
-		}
-
 		private void InitStaticTables()
 		{
 			if (areStaticTablesInitialized)

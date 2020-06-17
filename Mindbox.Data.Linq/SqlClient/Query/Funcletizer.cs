@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using Mindbox.Expressions;
 
 namespace System.Data.Linq.SqlClient {
     using System.Data.Linq.Mapping;
@@ -57,11 +56,7 @@ namespace System.Data.Linq.SqlClient {
                         }
                     }
                 }
-                var useExpressionFunctions = Mindbox.Data.Linq.Configuration.UseExpressionFunctions();
-                var function = useExpressionFunctions
-                    ? ExpressionFunctionFactory.Create(e)
-                    : Expression.Lambda(e).Compile();
-
+                var function = Expression.Lambda(e).Compile();
                 return Expression.Invoke(Expression.Constant(function));
             }
         }

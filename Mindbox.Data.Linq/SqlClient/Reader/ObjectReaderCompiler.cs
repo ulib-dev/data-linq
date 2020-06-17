@@ -16,8 +16,6 @@ using System.Threading;
 using System.Data.Linq.SqlClient.Implementation;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
-using Mindbox.Data.Linq.Proxy;
-using Mindbox.Expressions;
 
 namespace System.Data.Linq.SqlClient 
 {
@@ -1166,7 +1164,7 @@ namespace System.Data.Linq.SqlClient
                         }
                         else 
 						{
-							GenerateAssignDeferredReferenceInProxy(mm, locInstance, expr, locStoreInMember);
+                            throw Error.DeferredMemberWrongType();
                         }
                         gen.MarkLabel(labEndDeferLoad);
                     }
@@ -1411,48 +1409,6 @@ namespace System.Data.Linq.SqlClient
 
                 gen.MarkLabel(labExit);
             }
-
-			private void GenerateAssignDeferredReferenceInProxy(
-				MetaDataMember mm,
-				LocalBuilder locInstance,
-				SqlExpression expr,
-				LocalBuilder locStoreInMember)
-			{
-				var attributedMetaDataMember = (AttributedMetaDataMember)mm;
-				if (!attributedMetaDataMember.DoesRequireProxy)
-					throw new InvalidOperationException("!attributedMetaDataMember.DoesRequireProxy");
-
-				var memberType = typeof(EntityRef<>).MakeGenericType(mm.Type);
-				var labExit = gen.DefineLabel();
-
-				Action entityRefConstruction;
-				GeneratePrepareToAssignDeferredReference(
-					memberType, 
-					locInstance, 
-					expr, 
-					locStoreInMember, 
-					labExit, 
-					out entityRefConstruction);
-
-				GenerateLoadForMemberAccess(locInstance);
-
-				gen.Emit(OpCodes.Castclass, typeof(IEntityProxy));
-
-				gen.Emit(OpCodes.Ldtoken, ((PropertyInfo)mm.Member).GetGetMethod(nonPublic: true));
-				var handleConvertionMethod = ReflectionExpressions.GetMethodInfo(() =>
-					MethodBase.GetMethodFromHandle(default(RuntimeMethodHandle)));
-				gen.Emit(GetMethodCallOpCode(handleConvertionMethod), handleConvertionMethod);
-
-				entityRefConstruction();
-
-				var meth = ReflectionExpressions
-					.GetMethodInfo<IEntityProxy>(proxy => proxy.SetEntityRef(default(MemberInfo), default(EntityRef<object>)))
-					.GetGenericMethodDefinition()
-					.MakeGenericMethod(mm.Type);
-				gen.Emit(GetMethodCallOpCode(meth), meth);
-
-				gen.MarkLabel(labExit);
-			}
 
 	        private void GeneratePrepareToAssignDeferredReference(
 				Type memberType,

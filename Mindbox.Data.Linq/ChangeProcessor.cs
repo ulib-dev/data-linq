@@ -371,7 +371,7 @@ namespace System.Data.Linq {
         static private ChangeConflictException CreateChangeConflictException(int totalUpdatesAttempted, int failedUpdates) {
             string msg = Strings.RowNotFoundOrChanged;
             if (totalUpdatesAttempted > 1) {
-                msg = Strings.UpdatesFailedMessage(failedUpdates, totalUpdatesAttempted);
+                msg = String.Format(Strings.UpdatesFailedMessage, failedUpdates, totalUpdatesAttempted);
             }
             return new ChangeConflictException(msg);
         }

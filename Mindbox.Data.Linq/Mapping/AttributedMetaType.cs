@@ -5,7 +5,6 @@ using System.Data.Linq.SqlClient;
 using System.Linq;
 using System.Reflection;
 using LinqToSqlShared.Mapping;
-using Mindbox.Data.Linq.Proxy;
 
 namespace System.Data.Linq.Mapping
 {
@@ -59,24 +58,6 @@ namespace System.Data.Linq.Mapping
 			InitDataMembers();
 			identities = dataMembers.Where(dataMember => dataMember.IsPrimaryKey).ToList().AsReadOnly();
 			persistentMembers = dataMembers.Where(dataMember => dataMember.IsPersistent).ToList().AsReadOnly();
-			DoesRequireProxy = dataMembers.Cast<AttributedMetaDataMember>().Any(dataMember => 
-				dataMember.DoesRequireProxy) ||
-				(!typeof(INotifyPropertyChanging).IsAssignableFrom(type) &&
-					!typeof(INotifyPropertyChanged).IsAssignableFrom(type) &&
-					AreAllDataMembersOverridable);
-
-			if (DoesRequireProxy)
-			{
-				if (typeof(INotifyPropertyChanging).IsAssignableFrom(type))
-					throw new InvalidOperationException(
-						"Entity type requiring proxy cannot implement INotifyPropertyChanging: " + type + ".");
-				if (typeof(INotifyPropertyChanged).IsAssignableFrom(type))
-					throw new InvalidOperationException(
-						"Entity type requiring proxy cannot implement INotifyPropertyChanged: " + type + ".");
-				if (!AreAllDataMembersOverridable)
-					throw new InvalidOperationException(
-						"Entity type requiring proxy must have all data members overridable: " + type + ".");
-			}
 		}
 
 
@@ -285,9 +266,6 @@ namespace System.Data.Linq.Mapping
 				return hasAnyLoadMethod;
 			}
 		}
-
-
-		internal bool DoesRequireProxy { get; private set; }
 
 
 		private bool AreAllDataMembersOverridable
