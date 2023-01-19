@@ -517,11 +517,6 @@ namespace System.Data.Linq
 			return new InvalidOperationException(String.Format(Strings.DbGeneratedChangeNotAllowed, name, s));
 		}
 
-		public static Exception ProviderNotInstalled(string dbName, string sqlCeProviderInvariantName)
-		{
-			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { dbName, sqlCeProviderInvariantName }));
-		}
-
 		public static Exception ProviderNotSupported(string dbName, string sqlProviderInvariantName)
 		{
 			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { dbName, sqlProviderInvariantName }));
@@ -650,11 +645,6 @@ namespace System.Data.Linq
 		public static Exception EntitySetModifiedDuringEnumeration()
 		{
 			return new InvalidOperationException(Strings.EntitySetModifiedDuringEnumeration);
-		}
-
-		public static Exception CreateDatabaseFailedBecauseSqlCEDatabaseAlreadyExists(string dbName)
-		{
-			return new InvalidOperationException(Strings.DefaultErrorMessage(new object[] { dbName }));
 		}
 
 		public static Exception PrimaryKeyInSubTypeNotSupported(string name, string s)

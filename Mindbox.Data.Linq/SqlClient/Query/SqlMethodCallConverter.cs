@@ -760,16 +760,7 @@ namespace System.Data.Linq.SqlClient {
                             // add leading zeros to milliseconds by RIGHT(CONVERT(NCHAR(4),1000+@ms),3) 
                             SqlExpression msRaw = sql.FunctionCall(typeof(string), "CONVERT", new SqlExpression[2] {char4,
                                        sql.Add(sql.ValueFromObject(1000, false, source),sox.Args[6])}, source);
-                            SqlExpression ms;
-                            if (this.providerMode == SqlProvider.ProviderMode.SqlCE) {
-                                //SqlCE doesn't have "RIGHT", so need to use "SUBSTRING"
-                                SqlExpression len = sql.FunctionCall(typeof(int), "LEN", new SqlExpression[1] { msRaw }, source);
-                                SqlExpression startIndex = sql.Binary(SqlNodeType.Sub, len, sql.ValueFromObject(2, false, source));
-                                ms = sql.FunctionCall(typeof(string), "SUBSTRING", new SqlExpression[3] { msRaw, startIndex, sql.ValueFromObject(3, false, source) }, source);
-                            }
-                            else {
-                                ms = sql.FunctionCall(typeof(string), "RIGHT", new SqlExpression[2] { msRaw, sql.ValueFromObject(3, false, source) }, source);
-                            }
+                            SqlExpression ms = sql.FunctionCall(typeof(string), "RIGHT", new SqlExpression[2] { msRaw, sql.ValueFromObject(3, false, source) }, source);
                             dateAndTime = sql.Concat(dateAndTime, sql.ValueFromObject('.', false, source), ms);
                             return sql.FunctionCall(typeof(DateTime), "CONVERT", new SqlExpression[3] { datetime, dateAndTime, sql.ValueFromObject(121, false, source) }, source);
                         }

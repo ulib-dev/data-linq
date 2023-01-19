@@ -10,20 +10,8 @@ namespace System.Data.Linq.SqlClient {
 
     internal static class SqlTypeSystem {
 
-        internal static TypeSystemProvider Create2000Provider() {
-            return new Sql2000Provider();
-        }
-
-        internal static TypeSystemProvider Create2005Provider() {
-            return new Sql2005Provider();
-        }
-
         internal static TypeSystemProvider Create2008Provider() {
             return new Sql2008Provider();
-        }
-
-        internal static TypeSystemProvider CreateCEProvider() {
-            return new SqlCEProvider();
         }
 
         // -1 is used to indicate a MAX size.  In ADO.NET, -1 is specified as the size
@@ -1526,86 +1514,6 @@ namespace System.Data.Linq.SqlClient {
 
                 return base.From(type, size);
             }
-        }
-
-        class Sql2000Provider : ProviderBase {
-            [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification="These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
-            internal override ProviderType From(Type type, int? size) {
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    type = type.GetGenericArguments()[0];
-                TypeCode tc = System.Type.GetTypeCode(type);
-                switch (tc) {
-                    case TypeCode.Boolean:
-                        return Create(SqlDbType.Bit);
-                    case TypeCode.Byte:
-                        return Create(SqlDbType.TinyInt);
-                    case TypeCode.SByte:
-                    case TypeCode.Int16:
-                        return Create(SqlDbType.SmallInt);
-                    case TypeCode.Int32:
-                    case TypeCode.UInt16:
-                        return Create(SqlDbType.Int);
-                    case TypeCode.Int64:
-                    case TypeCode.UInt32:
-                        return Create(SqlDbType.BigInt);
-                    case TypeCode.UInt64:
-                        return Create(SqlDbType.Decimal, 20, 0);
-                    case TypeCode.Decimal:
-                        return Create(SqlDbType.Decimal, 29, size ?? 4);
-                    case TypeCode.Double:
-                        return Create(SqlDbType.Float);
-                    case TypeCode.Single:
-                        return Create(SqlDbType.Real);
-                    case TypeCode.Char:
-                        return Create(SqlDbType.NChar, 1);
-                    case TypeCode.String:
-                        return GetBestType(SqlDbType.NVarChar, size);               
-                    case TypeCode.DateTime:
-                        return Create(SqlDbType.DateTime);
-                    case TypeCode.Object: {
-                            if (type == typeof(Guid))
-                                return Create(SqlDbType.UniqueIdentifier);
-                            if (type == typeof(byte[]) || type == typeof(Binary))
-                                return GetBestType(SqlDbType.VarBinary, size); 
-                            if (type == typeof(char[]))
-                                return GetBestType(SqlDbType.NVarChar, size);
-                            if (type == typeof(TimeSpan))
-                                return Create(SqlDbType.BigInt);
-                            if (type == typeof(System.Xml.Linq.XDocument) ||
-                                type == typeof(System.Xml.Linq.XElement))
-                                return theNText;
-                            // else UDT?
-                            return new SqlType(type);
-                        }
-                    default:
-                        throw Error.UnexpectedTypeCode(tc);
-                }
-            }
-
-            internal override ProviderType GetBestLargeType(ProviderType type) {
-                SqlType sqlType = (SqlType)type;
-                switch (sqlType.SqlDbType) {
-                    case SqlDbType.NChar:
-                    case SqlDbType.NVarChar:
-                        return Create(SqlDbType.NText);
-                    case SqlDbType.Char:
-                    case SqlDbType.VarChar:
-                        return Create(SqlDbType.Text);
-                    case SqlDbType.Binary:
-                    case SqlDbType.VarBinary:
-                        return Create(SqlDbType.Image);
-                }
-                return type;
-            }
-
-            protected override bool SupportsMaxSize
-            {
-                get { return false; }
-            }
-
-        }
-
-        class SqlCEProvider : Sql2000Provider {
         }
     }
 }

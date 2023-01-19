@@ -22,18 +22,6 @@ using System.Runtime.Versioning;
 using System.Runtime.CompilerServices;
 
 namespace System.Data.Linq.SqlClient {
-    public sealed class Sql2000Provider : SqlProvider {
-        public Sql2000Provider()
-            : base(ProviderMode.Sql2000) {
-        }
-    }
-
-    public sealed class Sql2005Provider : SqlProvider {
-        public Sql2005Provider()
-            : base(ProviderMode.Sql2005) {
-        }
-    }
-
     public sealed class Sql2008Provider : SqlProvider {
         public Sql2008Provider()
             : base(ProviderMode.Sql2008) {
@@ -66,16 +54,9 @@ namespace System.Data.Linq.SqlClient {
 
         internal enum ProviderMode {
             NotYetDecided,
-            Sql2000,
-            Sql2005,
             Sql2008,
-            SqlCE
         }
 
-        const string SqlCeProviderInvariantName = "System.Data.SqlServerCe.3.5";
-        const string SqlCeDataReaderTypeName = "System.Data.SqlServerCe.SqlCeDataReader";
-        const string SqlCeConnectionTypeName = "System.Data.SqlServerCe.SqlCeConnection";
-        const string SqlCeTransactionTypeName = "System.Data.SqlServerCe.SqlCeTransaction";
         const string CommandTextKey = "SqlCommandText";
         const string CommandParametersKey = "SqlParameters";
 
@@ -90,30 +71,12 @@ namespace System.Data.Linq.SqlClient {
         
         private void InitializeProviderMode() {
             if (this.mode == ProviderMode.NotYetDecided) {
-                if (this.IsSqlCe) {
-                    this.mode = ProviderMode.SqlCE;
-                } else if (this.IsServer2KOrEarlier) {
-                    this.mode = ProviderMode.Sql2000;
-                }
-                else if (this.IsServer2005) {
-                    this.mode = ProviderMode.Sql2005;
-                } else {
-                    this.mode = ProviderMode.Sql2008;
-                }
+                this.mode = ProviderMode.Sql2008;
             }
             if (this.typeProvider == null) {
                 switch (this.mode) {
-                    case ProviderMode.Sql2000:
-                        this.typeProvider = SqlTypeSystem.Create2000Provider();
-                        break;
-                    case ProviderMode.Sql2005:
-                        this.typeProvider = SqlTypeSystem.Create2005Provider();
-                        break;
                     case ProviderMode.Sql2008:
                         this.typeProvider = SqlTypeSystem.Create2008Provider();
-                        break;
-                    case ProviderMode.SqlCE:
-                        this.typeProvider = SqlTypeSystem.CreateCEProvider();
                         break;
                     default:
                         System.Diagnostics.Debug.Assert(false);
@@ -123,70 +86,6 @@ namespace System.Data.Linq.SqlClient {
             if (this.sqlFactory == null) {
                 this.sqlFactory = new SqlFactory(this.typeProvider, this.services.Model);
                 this.translator = new Translator(this.services, this.sqlFactory, this.typeProvider);
-            }
-        }
-
-        /// <summary>
-        /// Return true if the current connection is SQLCE.
-        /// </summary>
-        private bool IsSqlCe {
-            get {
-                DbConnection con = conManager.UseConnection(this);
-                try {
-                    if (String.CompareOrdinal(con.GetType().FullName, SqlCeConnectionTypeName) == 0) {
-                        return true;
-                    }
-                } finally {
-                    conManager.ReleaseConnection(this);
-                }
-                return false;
-            }
-        }
-        
-        /// <summary>
-        /// Return true if this is a 2K (or earlier) server. This may be a round trip to the server.
-        /// </summary>
-        private bool IsServer2KOrEarlier {
-            get {
-                DbConnection con = conManager.UseConnection(this);
-                try {
-                    string serverVersion = con.ServerVersion;
-                    if (serverVersion.StartsWith("06.00.", StringComparison.Ordinal)) {
-                        return true;
-                    }
-                    else if (serverVersion.StartsWith("06.50.", StringComparison.Ordinal)) {
-                        return true;
-                    }
-                    else if (serverVersion.StartsWith("07.00.", StringComparison.Ordinal)) {
-                        return true;
-                    }
-                    else if (serverVersion.StartsWith("08.00.", StringComparison.Ordinal)) {
-                        return true;
-                    }
-                    return false;
-                }
-                finally {
-                    conManager.ReleaseConnection(this);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Return true if this is a SQL 2005 server. This may be a round trip to the server.
-        /// </summary>
-        private bool IsServer2005 {
-            get {
-                DbConnection con = conManager.UseConnection(this);
-                try {
-                    string serverVersion = con.ServerVersion;
-                    if (serverVersion.StartsWith("09.00.", StringComparison.Ordinal)) {
-                        return true;
-                    }
-                    return false;
-                }
-                finally {
-                    conManager.ReleaseConnection(this);
-                }
             }
         }
 
@@ -343,29 +242,18 @@ namespace System.Data.Linq.SqlClient {
             if (fileOrServerOrConnectionString != null) {
                 string connectionString = this.GetConnectionString(fileOrServerOrConnectionString);
                 this.dbName = this.GetDatabaseName(connectionString);
-                if (this.dbName.EndsWith(".sdf", StringComparison.OrdinalIgnoreCase))
-                    throw Error.ProviderNotSupported(this.dbName, SqlCeProviderInvariantName);
                 con = new SqlConnection();
                 con.ConnectionString = connectionString;
             }
             else {
                 // We only support SqlTransaction and SqlCeTransaction
                 tx = connection as SqlTransaction;
-                if (tx == null) {
-                    // See if it's a SqlCeTransaction
-                    if (connection.GetType().FullName == SqlCeTransactionTypeName) {
-                        tx = connection as DbTransaction;
-                    }
-                }
                 if (tx != null) {
                     connection = tx.Connection;
                 }
                 con = connection as DbConnection;
                 if (con == null) {
                     throw Error.InvalidConnectionArgument("connection");
-                }
-                if (con.GetType().FullName == SqlCeConnectionTypeName) {
-                    this.mode = ProviderMode.SqlCE;
                 }
                 this.dbName = this.GetDatabaseName(con.ConnectionString);
             }
@@ -396,11 +284,7 @@ namespace System.Data.Linq.SqlClient {
 #endif
 
             Type readerType;
-            if (mode == ProviderMode.SqlCE) 
-            {
-                readerType = con.GetType().Module.GetType(SqlCeDataReaderTypeName);
-            }
-            else if (con is SqlConnection) 
+            if (con is SqlConnection) 
             {
                 readerType = typeof(SqlDataReader);
             }
@@ -513,51 +397,23 @@ namespace System.Data.Linq.SqlClient {
             builder.ConnectionString = this.conManager.Connection.ConnectionString;
 
             if (this.conManager.Connection.State == ConnectionState.Closed) {
-                if (this.mode == ProviderMode.SqlCE) {
-                    if (!File.Exists(this.dbName)) {
-                        Type engineType = this.conManager.Connection.GetType().Module.GetType("System.Data.SqlServerCe.SqlCeEngine");
-                        object engine = Activator.CreateInstance(engineType, new object[] { builder.ToString() });
-                        try {
-                            engineType.InvokeMember("CreateDatabase", BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod, null, engine, new object[] { }, CultureInfo.InvariantCulture);
-                        } 
-                        catch (TargetInvocationException tie) {
-                            throw tie.InnerException;
-                        } 
-                        finally {
-                            IDisposable disp = engine as IDisposable;
-                            if (disp != null) {
-                                disp.Dispose();
-                            }
-                        }
-                    } 
-                    else {
-                        throw Error.CreateDatabaseFailedBecauseSqlCEDatabaseAlreadyExists(this.dbName);
-                    }
-                } 
-                else {
-                    // get connection string w/o reference to new catalog
-                    object val;
-                    if (builder.TryGetValue("Initial Catalog", out val)) {
-                        catalog = val.ToString();
-                        builder.Remove("Initial Catalog");
-                    }
-                    if (builder.TryGetValue("Database", out val)) {
-                        catalog = val.ToString();
-                        builder.Remove("Database");
-                    }
-                    if (builder.TryGetValue("AttachDBFileName", out val)) {
-                        filename = val.ToString();
-                        builder.Remove("AttachDBFileName");
-                    }
+                // get connection string w/o reference to new catalog
+                object val;
+                if (builder.TryGetValue("Initial Catalog", out val)) {
+                    catalog = val.ToString();
+                    builder.Remove("Initial Catalog");
+                }
+                if (builder.TryGetValue("Database", out val)) {
+                    catalog = val.ToString();
+                    builder.Remove("Database");
+                }
+                if (builder.TryGetValue("AttachDBFileName", out val)) {
+                    filename = val.ToString();
+                    builder.Remove("AttachDBFileName");
                 }
                 this.conManager.Connection.ConnectionString = builder.ToString();
             }
             else {
-                if (this.mode == ProviderMode.SqlCE) {
-                    if (File.Exists(this.dbName)) {
-                        throw Error.CreateDatabaseFailedBecauseSqlCEDatabaseAlreadyExists(this.dbName);
-                    }
-                }
                 object val;
                 if (builder.TryGetValue("Initial Catalog", out val)) {
                     catalog = val.ToString();
@@ -594,70 +450,50 @@ namespace System.Data.Linq.SqlClient {
                 this.deleted = false;
 
                 // create database
-                if (this.mode == ProviderMode.SqlCE) {
+                string createdb = SqlBuilder.GetCreateDatabaseCommand(catalog, filename, Path.ChangeExtension(filename, ".ldf"));
+                this.ExecuteCommand(createdb);
+                this.conManager.Connection.ChangeDatabase(catalog);
 
-                    // create tables
+                // create the schemas that our tables will need
+                // cannot be batched together with the rest of the CREATE TABLES
+                if (this.mode == ProviderMode.Sql2008) {
+                    HashSet<string> schemaCommands = new HashSet<string>();
+
                     foreach (MetaTable table in this.services.Model.GetTables()) {
-                        string command = SqlBuilder.GetCreateTableCommand(table);
-                        if (!String.IsNullOrEmpty(command)) {
-                            this.ExecuteCommand(command);
+                        string schemaCommand = SqlBuilder.GetCreateSchemaForTableCommand(table);
+                        if (!string.IsNullOrEmpty(schemaCommand)) {
+                            schemaCommands.Add(schemaCommand);
                         }
                     }
-                    // create all foreign keys after all tables are defined
-                    foreach (MetaTable table in this.services.Model.GetTables()) {
-                        foreach (string command in SqlBuilder.GetCreateForeignKeyCommands(table)) {
-                            if (!String.IsNullOrEmpty(command)) {
-                                this.ExecuteCommand(command);
-                            }
+
+                    foreach (string schemaCommand in schemaCommands) {
+                        this.ExecuteCommand(schemaCommand);
+                    }
+                }
+
+                StringBuilder sb = new StringBuilder();
+
+                // create tables
+                foreach (MetaTable table in this.services.Model.GetTables()) {
+                    string createTable = SqlBuilder.GetCreateTableCommand(table);
+                    if (!string.IsNullOrEmpty(createTable)) {
+                        sb.AppendLine(createTable);
+                    }
+                }
+
+                // create all foreign keys after all tables are defined
+                foreach (MetaTable table in this.services.Model.GetTables()) {
+                    foreach (string createFK in SqlBuilder.GetCreateForeignKeyCommands(table)) {
+                        if (!string.IsNullOrEmpty(createFK)) {
+                            sb.AppendLine(createFK);
                         }
                     }
                 }
-                else {
-                    string createdb = SqlBuilder.GetCreateDatabaseCommand(catalog, filename, Path.ChangeExtension(filename, ".ldf"));
-                    this.ExecuteCommand(createdb);
-                    this.conManager.Connection.ChangeDatabase(catalog);
 
-                    // create the schemas that our tables will need
-                    // cannot be batched together with the rest of the CREATE TABLES
-                    if (this.mode == ProviderMode.Sql2005 || this.mode == ProviderMode.Sql2008) {
-                        HashSet<string> schemaCommands = new HashSet<string>();
-
-                        foreach (MetaTable table in this.services.Model.GetTables()) {
-                            string schemaCommand = SqlBuilder.GetCreateSchemaForTableCommand(table);
-                            if (!string.IsNullOrEmpty(schemaCommand)) {
-                                schemaCommands.Add(schemaCommand);
-                            }
-                        }
-
-                        foreach (string schemaCommand in schemaCommands) {
-                            this.ExecuteCommand(schemaCommand);
-                        }
-                    }
-
-                    StringBuilder sb = new StringBuilder();
-
-                    // create tables
-                    foreach (MetaTable table in this.services.Model.GetTables()) {
-                        string createTable = SqlBuilder.GetCreateTableCommand(table);
-                        if (!string.IsNullOrEmpty(createTable)) {
-                            sb.AppendLine(createTable);
-                        }
-                    }
-
-                    // create all foreign keys after all tables are defined
-                    foreach (MetaTable table in this.services.Model.GetTables()) {
-                        foreach (string createFK in SqlBuilder.GetCreateForeignKeyCommands(table)) {
-                            if (!string.IsNullOrEmpty(createFK)) {
-                                sb.AppendLine(createFK);
-                            }
-                        }
-                    }
-
-                    if (sb.Length > 0) {
-                        // must be on when creating indexes on computed columns
-                        sb.Insert(0, "SET ARITHABORT ON" + Environment.NewLine);
-                        this.ExecuteCommand(sb.ToString());
-                    }
+                if (sb.Length > 0) {
+                    // must be on when creating indexes on computed columns
+                    sb.Insert(0, "SET ARITHABORT ON" + Environment.NewLine);
+                    this.ExecuteCommand(sb.ToString());
                 }
             }
             finally {
@@ -679,35 +515,27 @@ namespace System.Data.Linq.SqlClient {
                 return;
             }
 
-            if (this.mode == ProviderMode.SqlCE) {
-                ((IProvider)this).ClearConnection();
-                System.Diagnostics.Debug.Assert(this.conManager.Connection.State == ConnectionState.Closed);
-                File.Delete(this.dbName);
+            string holdConnStr = conManager.Connection.ConnectionString;
+            DbConnection con = this.conManager.UseConnection(this);
+            try {
+                con.ChangeDatabase("master");
+                if (con is SqlConnection) {
+                    SqlConnection.ClearAllPools();
+                }
+                if (this.log != null) {
+                    this.log.WriteLine(Strings.LogAttemptingToDeleteDatabase(this.dbName));
+                }
+                this.ExecuteCommand(SqlBuilder.GetDropDatabaseCommand(this.dbName));
                 this.deleted = true;
             }
-            else {
-                string holdConnStr = conManager.Connection.ConnectionString;
-                DbConnection con = this.conManager.UseConnection(this);
-                try {
-                    con.ChangeDatabase("master");
-                    if (con is SqlConnection) {
-                        SqlConnection.ClearAllPools();
-                    }
-                    if (this.log != null) {
-                        this.log.WriteLine(Strings.LogAttemptingToDeleteDatabase(this.dbName));
-                    }
-                    this.ExecuteCommand(SqlBuilder.GetDropDatabaseCommand(this.dbName));
-                    this.deleted = true;
-                }
-                finally {
-                    this.conManager.ReleaseConnection(this);
-                    if (conManager.Connection.State == ConnectionState.Closed &&
-                        string.Compare(conManager.Connection.ConnectionString, holdConnStr, StringComparison.Ordinal) != 0) {
-                        // Credential information may have been stripped from the connection
-                        // string as a result of opening the connection. Restore the full
-                        // connection string.
-                        conManager.Connection.ConnectionString = holdConnStr;
-                    }
+            finally {
+                this.conManager.ReleaseConnection(this);
+                if (conManager.Connection.State == ConnectionState.Closed &&
+                    string.Compare(conManager.Connection.ConnectionString, holdConnStr, StringComparison.Ordinal) != 0) {
+                    // Credential information may have been stripped from the connection
+                    // string as a result of opening the connection. Restore the full
+                    // connection string.
+                    conManager.Connection.ConnectionString = holdConnStr;
                 }
             }
         }
@@ -724,28 +552,23 @@ namespace System.Data.Linq.SqlClient {
             // Don't need to call InitializeProviderMode() here since we don't need to know the provider to do this.
 
             bool exists = false;
-            if (this.mode == ProviderMode.SqlCE) {
-                exists = File.Exists(this.dbName);
-            }
-            else {
-                string holdConnStr = conManager.Connection.ConnectionString;
-                try {
-                    // If no database name is explicitly specified on the connection,
-                    // UseConnection will connect to 'Master', which is why after connecting
-                    // we call ChangeDatabase to verify that the database actually exists.
-                    this.conManager.UseConnection(this);
-                    this.conManager.Connection.ChangeDatabase(this.dbName);
-                    this.conManager.ReleaseConnection(this);
-                    exists = true;
-                } catch (Exception) {
-                } finally {
-                    if (conManager.Connection.State == ConnectionState.Closed &&
-                        string.Compare(conManager.Connection.ConnectionString, holdConnStr, StringComparison.Ordinal) != 0) {
-                        // Credential information may have been stripped from the connection
-                        // string as a result of opening the connection. Restore the full
-                        // connection string.
-                        conManager.Connection.ConnectionString = holdConnStr;
-                    }
+            string holdConnStr = conManager.Connection.ConnectionString;
+            try {
+                // If no database name is explicitly specified on the connection,
+                // UseConnection will connect to 'Master', which is why after connecting
+                // we call ChangeDatabase to verify that the database actually exists.
+                this.conManager.UseConnection(this);
+                this.conManager.Connection.ChangeDatabase(this.dbName);
+                this.conManager.ReleaseConnection(this);
+                exists = true;
+            } catch (Exception) {
+            } finally {
+                if (conManager.Connection.State == ConnectionState.Closed &&
+                    string.Compare(conManager.Connection.ConnectionString, holdConnStr, StringComparison.Ordinal) != 0) {
+                    // Credential information may have been stripped from the connection
+                    // string as a result of opening the connection. Restore the full
+                    // connection string.
+                    conManager.Connection.ConnectionString = holdConnStr;
                 }
             }
             return exists;
@@ -904,12 +727,11 @@ namespace System.Data.Linq.SqlClient {
         /// add annotations for.
         /// </summary>
         private void CheckSqlCompatibility(QueryInfo[] queries, SqlNodeAnnotations annotations) {
-            if (this.Mode == ProviderMode.Sql2000 ||
-                this.Mode == ProviderMode.SqlCE) {
-                for (int i = 0, n = queries.Length; i < n; i++) {
-                    SqlServerCompatibilityCheck.ThrowIfUnsupported(queries[i].Query, annotations, this.Mode);
-                }
-            }
+            //if (this.Mode == ProviderMode.Sql2000) {
+            //    for (int i = 0, n = queries.Length; i < n; i++) {
+            //        SqlServerCompatibilityCheck.ThrowIfUnsupported(queries[i].Query, annotations, this.Mode);
+            //    }
+            //}
         }
 
         private IExecuteResult ExecuteAll(Expression query, QueryInfo[] queryInfos, IObjectReaderFactory factory, object[] userArguments, ICompiledSubQuery[] subQueries) {
@@ -1366,13 +1188,6 @@ namespace System.Data.Linq.SqlClient {
             // convert query nodes into sql nodes
             QueryConverter converter = new QueryConverter(this.services, this.typeProvider, this.translator, this.sqlFactory);
             switch (this.Mode) {
-                case ProviderMode.Sql2000:
-                    converter.ConverterStrategy =
-                        ConverterStrategy.CanUseScopeIdentity |
-                        ConverterStrategy.CanUseJoinOn |
-                        ConverterStrategy.CanUseRowStatus;
-                    break;
-                case ProviderMode.Sql2005:
                 case ProviderMode.Sql2008:
                     converter.ConverterStrategy =
                         ConverterStrategy.CanUseScopeIdentity |
@@ -1381,11 +1196,6 @@ namespace System.Data.Linq.SqlClient {
                         ConverterStrategy.CanUseJoinOn |
                         ConverterStrategy.CanUseOuterApply |
                         ConverterStrategy.CanOutputFromInsert;
-                    break;
-                case ProviderMode.SqlCE:
-                    converter.ConverterStrategy = ConverterStrategy.CanUseOuterApply;
-                    // Can't set ConverterStrategy.CanUseJoinOn because scalar subqueries in the ON clause
-                    // can't be converted into anything.
                     break;
             }
             SqlNode node = converter.ConvertOuter(query);
@@ -1411,7 +1221,7 @@ namespace System.Data.Linq.SqlClient {
             SqlColumnizer columnizer = new SqlColumnizer();
 
             // resolve member references
-            bool canUseOuterApply = (this.Mode == ProviderMode.Sql2005 || this.Mode == ProviderMode.Sql2008 || this.Mode == ProviderMode.SqlCE);
+            bool canUseOuterApply = (this.Mode == ProviderMode.Sql2008);
             SqlBinder binder = new SqlBinder(this.translator, this.sqlFactory, this.services.Model, this.services.Context.LoadOptions, columnizer, canUseOuterApply);
             binder.OptimizeLinkExpansions = (optimizationFlags & OptimizationFlags.OptimizeLinkExpansions) != 0;
             binder.SimplifyCaseStatements = (optimizationFlags & OptimizationFlags.SimplifyCaseStatements) != 0;
@@ -1444,9 +1254,7 @@ namespace System.Data.Linq.SqlClient {
             validator.Validate(node);
 
             // convert multisets into separate queries
-            SqlMultiplexer.Options options = (this.Mode == ProviderMode.Sql2008 || 
-                                              this.Mode == ProviderMode.Sql2005 ||
-                                              this.Mode == ProviderMode.SqlCE) 
+            SqlMultiplexer.Options options = (this.Mode == ProviderMode.Sql2008) 
                 ? SqlMultiplexer.Options.EnableBigJoin : SqlMultiplexer.Options.None;
             SqlMultiplexer mux = new SqlMultiplexer(options, parentParameters, this.sqlFactory);
             node = mux.Multiplex(node);
@@ -1456,11 +1264,6 @@ namespace System.Data.Linq.SqlClient {
             SqlFlattener flattener = new SqlFlattener(this.sqlFactory, columnizer);
             node = flattener.Flatten(node);
             validator.Validate(node);
-
-            if (this.mode == ProviderMode.SqlCE) {
-                SqlRewriteScalarSubqueries rss = new SqlRewriteScalarSubqueries(this.sqlFactory);
-                node = rss.Rewrite(node);
-            }
 
             // Simplify case statements where all alternatives map to the same thing.
             // Doing this before deflator because the simplified results may lead to
@@ -1547,37 +1350,15 @@ namespace System.Data.Linq.SqlClient {
 
             SqlParameterizer parameterizer = new SqlParameterizer(this.typeProvider, annotations);
             SqlFormatter formatter = new SqlFormatter(((IProvider)this).StatementLabel);
-            if (this.mode == ProviderMode.SqlCE ||
-                this.mode == ProviderMode.Sql2005 ||
-                this.mode == ProviderMode.Sql2008) {
+            if (this.mode == ProviderMode.Sql2008) {
                 formatter.ParenthesizeTop = true;
             }
 
-            SqlBlock block = node as SqlBlock;
-            if (block != null && this.mode == ProviderMode.SqlCE) {
-                // SQLCE cannot batch multiple statements.
-                ReadOnlyCollection<ReadOnlyCollection<SqlParameterInfo>> parameters = parameterizer.ParameterizeBlock(block);
-                string[] commands = formatter.FormatBlock(block, false);
-                QueryInfo[] queries = new QueryInfo[commands.Length];
-                for (int i = 0, n = commands.Length; i < n; i++) {
-                    queries[i] = new QueryInfo(
-                        block.Statements[i],
-                        commands[i],
-                        parameters[i],
-                        (i < n - 1) ? ResultShape.Return : resultShape,
-                        (i < n - 1) ? typeof(int) : resultType
-                        );
-                }
-                return queries;
-            }
-            else {
-                // build only one result
-                ReadOnlyCollection<SqlParameterInfo> parameters = parameterizer.Parameterize(node);
-                string commandText = formatter.Format(node);
-                return new QueryInfo[] {
-                    new QueryInfo(node, commandText, parameters, resultShape, resultType)
-                    };
-            }
+            ReadOnlyCollection<SqlParameterInfo> parameters = parameterizer.Parameterize(node);
+            string commandText = formatter.Format(node);
+            return new QueryInfo[] {
+                new QueryInfo(node, commandText, parameters, resultShape, resultType)
+                };
         }
 
         private SqlSelect GetFinalSelect(SqlNode node) {

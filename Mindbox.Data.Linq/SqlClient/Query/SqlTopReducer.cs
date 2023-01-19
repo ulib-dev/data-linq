@@ -33,10 +33,6 @@ namespace System.Data.Linq.SqlClient {
                             select.Top = sql.Value(val.ClrType, val.SqlType, val.Value, false, val.SourceExpression);
                         }
                     }
-                    else {
-                        // cannot be converted to literal value. note that this select is not SQL2K compatible
-                        this.annotations.Add(select.Top, new SqlServerCompatibilityAnnotation(Strings.SourceExpressionAnnotation(select.Top.SourceExpression), SqlProvider.ProviderMode.Sql2000));
-                    }
                 }
                 return select;
             }

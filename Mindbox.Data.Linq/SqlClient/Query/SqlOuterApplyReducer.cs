@@ -50,9 +50,6 @@ namespace System.Data.Linq.SqlClient {
                                 }
                             }
                         }
-                        else {
-                            this.AnnotateSqlIncompatibility(join, SqlProvider.ProviderMode.Sql2000);
-                        }
                     }
                     else if (join.JoinType == SqlJoinType.CrossApply) {
                         // reduce cross apply with special nested left-outer-join's into a single left-outer-join
@@ -101,9 +98,6 @@ namespace System.Data.Linq.SqlClient {
                                 join.Condition = this.factory.AndAccumulate(leftOuter.Condition, liftedPredicate);
                                 join.Right = leftOuter.Right;
                             }
-                            else {
-                                this.AnnotateSqlIncompatibility(join, SqlProvider.ProviderMode.Sql2000);
-                            }
                         }
                     }
 
@@ -139,10 +133,6 @@ namespace System.Data.Linq.SqlClient {
                 }
 
                 return source;
-            }
-
-            private void AnnotateSqlIncompatibility(SqlNode node, params SqlProvider.ProviderMode[] providers) {
-                this.annotations.Add(node, new SqlServerCompatibilityAnnotation(Strings.SourceExpressionAnnotation(node.SourceExpression), providers));
             }
 
             [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification="Unknown reason.")]

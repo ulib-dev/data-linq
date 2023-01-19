@@ -307,11 +307,18 @@ namespace System.Data.Linq.SqlClient {
                 else if (node.NodeType == SqlNodeType.ClientParameter) {
                     throw Error.ParametersCannotBeSequences();
                 }
-                // this needs to be a sequence expression!
-                SqlExpression sqlExpr = (SqlExpression)node;
-                SqlAlias sa = new SqlAlias(sqlExpr);
-                SqlAliasRef aref = new SqlAliasRef(sa);
-                return new SqlSelect(aref, sa, this.dominatingExpression);
+                else if (node.NodeType == SqlNodeType.UserQuery) {
+                    SqlUserQuery uq = (SqlUserQuery)node;
+                    SqlAlias sa = new SqlAlias(uq.Projection);
+                    SqlAliasRef aref = new SqlAliasRef(sa);
+                    return new SqlSelect(aref, sa, this.dominatingExpression);
+                } else {
+                    // this needs to be a sequence expression!
+                    SqlExpression sqlExpr = (SqlExpression)node;
+                    SqlAlias sa = new SqlAlias(sqlExpr);
+                    SqlAliasRef aref = new SqlAliasRef(sa);
+                    return new SqlSelect(aref, sa, this.dominatingExpression);
+                }
             }
             return select;
         }

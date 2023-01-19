@@ -39,13 +39,18 @@ namespace System.Data.Linq {
                     return new Binary(((Guid)value).ToByteArray());
                 }
                 else {
+#if NET6_0_OR_GREATER
+                    throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
+#else
                     BinaryFormatter formatter = new BinaryFormatter();
                     byte[] streamArray;
-                    using (MemoryStream stream = new MemoryStream()) {
+                    using (MemoryStream stream = new MemoryStream())
+                    {
                         formatter.Serialize(stream, value);
                         streamArray = stream.ToArray();
                     }
                     return new Binary(streamArray);
+#endif
                 }
             }
             else if (toType == typeof(byte[])) {
@@ -55,7 +60,11 @@ namespace System.Data.Linq {
                 else if (fromType == typeof(Guid)) {
                     return ((Guid)value).ToByteArray();
                 }
-                else {
+                else
+                {
+#if NET6_0_OR_GREATER
+                    throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
+#else
                     BinaryFormatter formatter = new BinaryFormatter();
                     byte[] returnValue;
                     using (MemoryStream stream = new MemoryStream()) {
@@ -63,19 +72,25 @@ namespace System.Data.Linq {
                         returnValue = stream.ToArray();
                     }
                     return returnValue;
+#endif
                 }
             }
             else if (fromType == typeof(byte[])) {
                 if (toType == typeof(Guid)) {
                     return new Guid((byte[])value);
                 }
-                else {
+                else
+                {
+#if NET6_0_OR_GREATER
+                    throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
+#else
                     BinaryFormatter formatter = new BinaryFormatter();
                     object returnValue;
                     using (MemoryStream stream = new MemoryStream((byte[])value)) {
                         returnValue = ChangeType(formatter.Deserialize(stream), toType);
                     }
                     return returnValue; 
+#endif
                 }
             }
             else if (fromType == typeof(Binary)) {
@@ -83,10 +98,14 @@ namespace System.Data.Linq {
                     return new Guid(((Binary)value).ToArray());
                 }
                 else {
+#if NET6_0_OR_GREATER
+                    throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
+#else
                     BinaryFormatter formatter = new BinaryFormatter();
                     using (MemoryStream stream = new MemoryStream(((Binary)value).ToArray(), false)) {
                         return ChangeType(formatter.Deserialize(stream), toType);
                     }
+#endif
                 }
             }
             else if (toType.IsEnum) {

@@ -228,12 +228,6 @@ namespace System.Data.Linq.SqlClient {
                     node.SetSqlType(newType);
                     return true;
                 }
-                // Since we are dealing with a long out parameter that hasn't been
-                // retyped, we need to annotate
-                this.parameterizer.annotations.Add(
-                    node, 
-                    new SqlServerCompatibilityAnnotation(
-                        SqlClient.Strings.MaxSizeNotSupported(node.SourceExpression), SqlProvider.ProviderMode.Sql2000));
                 return false;
             }
 
