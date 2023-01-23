@@ -156,7 +156,8 @@ namespace System.Data.Linq.SqlClient
                 {
 	                objectReaderType
                 },
-				true);
+                objectReaderType,
+                true);
 			gen.GenerateBody(dm.GetILGenerator(), expression);
 			return dm;
 		}
