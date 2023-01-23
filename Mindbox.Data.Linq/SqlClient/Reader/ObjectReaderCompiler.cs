@@ -21,8 +21,9 @@ namespace System.Data.Linq.SqlClient
 {
     internal class ObjectReaderCompiler : IObjectReaderCompiler 
 	{
-		private static readonly LocalDataStoreSlot cacheSlot = Thread.AllocateDataSlot();
-		private static int maxReaderCacheSize = 10;
+        [ThreadStatic]
+        private static ReaderFactoryCache readerFactoryCache;
+        private static int maxReaderCacheSize = 50;
 
         private readonly Type dataReaderType;
 		private readonly IDataServices services;
@@ -79,11 +80,11 @@ namespace System.Data.Linq.SqlClient
             var canBeCompared = SqlProjectionComparer.CanBeCompared(expression);
             if (canBeCompared) 
 			{
-                cache = (ReaderFactoryCache)Thread.GetData(cacheSlot);
+                cache = readerFactoryCache;
                 if (cache == null) 
 				{
                     cache = new ReaderFactoryCache(maxReaderCacheSize);
-                    Thread.SetData(cacheSlot, cache);
+                    readerFactoryCache = cache;
                 }
                 factory = cache.GetFactory(elementType, dataReaderType, mapping, options, expression);
             }
