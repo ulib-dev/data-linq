@@ -188,7 +188,7 @@ namespace System.Data.Linq.SqlClient
 
 	    private static Type FindIEnumerable(Type seqType) 
 		{
-            if (seqType == null || seqType == typeof(string))
+            if (seqType == null || seqType == typeof(string) || IsSimpleType(seqType))
                 return null;
             if (seqType.IsArray)
                 return typeof(IEnumerable<>).MakeGenericType(seqType.GetElementType());
