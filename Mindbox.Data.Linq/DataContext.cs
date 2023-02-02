@@ -693,12 +693,6 @@ namespace System.Data.Linq
             return provider.Translate(reader);
         }
 
-        public T CreateObject<T>()
-        {
-            return Services.Model.CreateObject<T>();
-        }
-
-
         /// <summary>
         /// Executes the equivalent of the specified method call on the database server.
         /// </summary>

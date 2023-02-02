@@ -1107,25 +1107,6 @@ namespace System.Data.Linq.SqlClient
                 return sn.ClrType;
             }
 
-            private Type GenerateNewProxy(SqlNew sn)
-            {
-                if (sn.Args.Any())
-                    throw new InvalidOperationException("sn.Args.Any()");
-
-                var locInstance = gen.DeclareLocal(sn.ClrType);
-
-                // construct the new instance
-                var factoryMethod = typeof(ObjectMaterializer<>)
-                    .MakeGenericType(compiler.dataReaderType)
-                    .GetMethod("CreateEntityProxy", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .MakeGenericMethod(sn.ClrType);
-                gen.Emit(OpCodes.Ldarg_0);
-                gen.Emit(GetMethodCallOpCode(factoryMethod), factoryMethod);
-                gen.Emit(OpCodes.Stloc, locInstance);
-
-                return GenerateInitializeNew(sn, locInstance);
-            }
-
             private void GenerateMemberAssignment(
                 MetaDataMember mm,
                 LocalBuilder locInstance,
@@ -2954,12 +2935,6 @@ namespace System.Data.Linq.SqlClient
                 }
                 return (IEnumerable<T>)factory.CreateDeferredSource(instance);
             }
-
-            public override T CreateEntityProxy<T>()
-            {
-                return (T)services.Model.CreateEntityProxy(typeof(T));
-            }
-
 
             internal void Buffer()
             {

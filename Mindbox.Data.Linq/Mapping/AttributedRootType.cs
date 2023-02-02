@@ -77,7 +77,7 @@ namespace System.Data.Linq.Mapping
             inheritanceTypes = types == null ?
                 new MetaType[]
                 {
-                    this
+                this
                 }
                     .ToList()
                     .AsReadOnly() :
@@ -102,17 +102,14 @@ namespace System.Data.Linq.Mapping
             get { return inheritanceDefault; }
         }
 
-
         public override MetaType GetInheritanceType(Type type)
         {
-            var nonProxyType = Model.UnproxyType(type);
-
-            if (nonProxyType == Type)
+            if (type == Type)
                 return this;
 
             MetaType metaType = null;
             if (types != null)
-                types.TryGetValue(nonProxyType, out metaType);
+                types.TryGetValue(type, out metaType);
             return metaType;
         }
 

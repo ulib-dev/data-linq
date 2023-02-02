@@ -98,7 +98,7 @@ namespace System.Data.Linq.Mapping
             if (rowType == null)
                 throw Error.ArgumentNull("rowType");
 
-            return GetTableCore(UnproxyType(rowType));
+            return GetTableCore(rowType);
         }
 
         public override MetaType GetMetaType(Type type)
@@ -106,19 +106,17 @@ namespace System.Data.Linq.Mapping
             if (type == null)
                 throw Error.ArgumentNull("type");
 
-            var nonProxyType = UnproxyType(type);
-
             MetaType mtype;
-            if (metaTypes.TryGetValue(nonProxyType, out mtype))
+            if (metaTypes.TryGetValue(type, out mtype))
                 return mtype;
 
             // Attributed meta model allows us to learn about tables we did not
             // statically know about
-            var tab = GetTable(nonProxyType);
+            var tab = GetTable(type);
             if (tab != null)
-                return tab.RowType.GetInheritanceType(nonProxyType);
+                return tab.RowType.GetInheritanceType(type);
 
-            return metaTypes.GetOrAdd(nonProxyType, innerType => new UnmappedType(this, nonProxyType));
+            return metaTypes.GetOrAdd(type, innerType => new UnmappedType(this, type));
         }
 
         public override MetaFunction GetFunction(MethodInfo method)

@@ -626,11 +626,10 @@ namespace System.Data.Linq
                 internal override object CreateDataCopy(object instance)
                 {
                     Debug.Assert(instance != null);
-                    var instanceType = type.Model.UnproxyType(instance.GetType());
+                    var instanceType = instance.GetType();
                     Debug.Assert(instanceType == type.Type);
 
-                    var isProxy = instance.GetType() != type.Type;
-                    var copy = isProxy ? type.Model.CreateEntityProxy(type.Type) : Activator.CreateInstance(type.Type);
+                    var copy = Activator.CreateInstance(type.Type);
 
                     var rootMetaType = tracker.services.Model.GetTable(type.Type).RowType.InheritanceRoot;
                     foreach (var mm in rootMetaType.GetInheritanceType(type.Type).PersistentDataMembers)

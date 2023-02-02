@@ -326,8 +326,7 @@ namespace System.Data.Linq.Mapping
 
         public override MetaType GetInheritanceType(Type inheritanceType)
         {
-            var nonProxyInheritanceType = model.UnproxyType(inheritanceType);
-            return nonProxyInheritanceType == type ? this : inheritanceRoot.GetInheritanceType(nonProxyInheritanceType);
+            return inheritanceType == type ? this : inheritanceRoot.GetInheritanceType(inheritanceType);
         }
 
         public override string ToString()

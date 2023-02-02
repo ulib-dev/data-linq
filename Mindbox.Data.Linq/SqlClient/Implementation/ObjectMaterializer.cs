@@ -63,11 +63,5 @@ namespace System.Data.Linq.SqlClient.Implementation
         public abstract IEnumerable<T> GetNestedLinkSource<T>(int globalLink, int localFactory, object instance);
 
         public abstract bool Read();
-
-        public virtual T CreateEntityProxy<T>()
-            where T : class, new()
-        {
-            throw new NotSupportedException();
-        }
     }
 }
