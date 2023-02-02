@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics.CodeAnalysis;
 
-namespace System.Data.Linq.SqlClient {
-    internal static class SqlNodeTypeOperators {
+namespace System.Data.Linq.SqlClient
+{
+    internal static class SqlNodeTypeOperators
+    {
 
         /// <summary>
         /// Determines whether the given unary operator node type returns a value that 
         /// is predicate.
         /// </summary> 
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification="These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
-        internal static bool IsPredicateUnaryOperator(this SqlNodeType nodeType) {
-            switch (nodeType) {
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
+        internal static bool IsPredicateUnaryOperator(this SqlNodeType nodeType)
+        {
+            switch (nodeType)
+            {
                 case SqlNodeType.Not:
                 case SqlNodeType.Not2V:
                 case SqlNodeType.IsNull:
@@ -40,9 +44,11 @@ namespace System.Data.Linq.SqlClient {
         /// <summary>
         /// Determines whether the given unary operator expects a predicate as input.
         /// </summary> 
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification="These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
-        internal static bool IsUnaryOperatorExpectingPredicateOperand(this SqlNodeType nodeType) {
-            switch (nodeType) {
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
+        internal static bool IsUnaryOperatorExpectingPredicateOperand(this SqlNodeType nodeType)
+        {
+            switch (nodeType)
+            {
                 case SqlNodeType.Not:
                 case SqlNodeType.Not2V:
                     return true;
@@ -71,9 +77,11 @@ namespace System.Data.Linq.SqlClient {
         /// Determines whether the given binary operator node type returns a value that 
         /// is a predicate boolean.
         /// </summary> 
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification="These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
-        internal static bool IsPredicateBinaryOperator(this SqlNodeType nodeType) {
-            switch (nodeType) {
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
+        internal static bool IsPredicateBinaryOperator(this SqlNodeType nodeType)
+        {
+            switch (nodeType)
+            {
                 case SqlNodeType.GE:
                 case SqlNodeType.GT:
                 case SqlNodeType.LE:
@@ -139,9 +147,11 @@ namespace System.Data.Linq.SqlClient {
         /// Determines whether the given binary operator node type returns a value that 
         /// is a predicate boolean.
         /// </summary> 
-        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification="These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
-        internal static bool IsBinaryOperatorExpectingPredicateOperands(this SqlNodeType nodeType) {
-            switch (nodeType) {
+        [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
+        internal static bool IsBinaryOperatorExpectingPredicateOperands(this SqlNodeType nodeType)
+        {
+            switch (nodeType)
+            {
                 case SqlNodeType.And:
                 case SqlNodeType.Or:
                     return true;
@@ -173,8 +183,10 @@ namespace System.Data.Linq.SqlClient {
         /// Determines whether the given node requires support on the client for evaluation.
         /// For example, LINK nodes may be delay-executed only when the user requests the result.
         /// </summary>
-        internal static bool IsClientAidedExpression(this SqlExpression expr) {
-            switch (expr.NodeType) {
+        internal static bool IsClientAidedExpression(this SqlExpression expr)
+        {
+            switch (expr.NodeType)
+            {
                 case SqlNodeType.Link:
                 case SqlNodeType.Element:
                 case SqlNodeType.Multiset:
@@ -184,7 +196,7 @@ namespace System.Data.Linq.SqlClient {
                     return true;
                 default:
                     return false;
-            };                              
+            };
         }
     }
 }

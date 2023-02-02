@@ -10,19 +10,23 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
-namespace System.Data.Linq {
+namespace System.Data.Linq
+{
 
-    public static class DBConvert {
+    public static class DBConvert
+    {
         private static Type[] StringArg = new Type[] { typeof(string) };
 
         [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "[....]: Generic parameters are required for strong-typing of the return type.")]
-        public static T ChangeType<T>(object value) {
+        public static T ChangeType<T>(object value)
+        {
             return (T)ChangeType(value, typeof(T));
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "[....]: Cast is dependent on node type and casts do not happen unecessarily in a single code path.")]
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
-        public static object ChangeType(object value, Type type) {
+        public static object ChangeType(object value, Type type)
+        {
             if (value == null)
                 return null;
             MethodInfo mi;
@@ -31,14 +35,18 @@ namespace System.Data.Linq {
             if (toType.IsAssignableFrom(fromType))
                 return value;
 
-            if (toType == typeof(Binary)) {
-                if (fromType == typeof(byte[])) {
+            if (toType == typeof(Binary))
+            {
+                if (fromType == typeof(byte[]))
+                {
                     return new Binary((byte[])value);
                 }
-                else if (fromType == typeof(Guid)) {
+                else if (fromType == typeof(Guid))
+                {
                     return new Binary(((Guid)value).ToByteArray());
                 }
-                else {
+                else
+                {
 #if NET6_0_OR_GREATER
                     throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
 #else
@@ -53,11 +61,14 @@ namespace System.Data.Linq {
 #endif
                 }
             }
-            else if (toType == typeof(byte[])) {
-                if (fromType == typeof(Binary)) {
+            else if (toType == typeof(byte[]))
+            {
+                if (fromType == typeof(Binary))
+                {
                     return ((Binary)value).ToArray();
                 }
-                else if (fromType == typeof(Guid)) {
+                else if (fromType == typeof(Guid))
+                {
                     return ((Guid)value).ToByteArray();
                 }
                 else
@@ -75,8 +86,10 @@ namespace System.Data.Linq {
 #endif
                 }
             }
-            else if (fromType == typeof(byte[])) {
-                if (toType == typeof(Guid)) {
+            else if (fromType == typeof(byte[]))
+            {
+                if (toType == typeof(Guid))
+                {
                     return new Guid((byte[])value);
                 }
                 else
@@ -93,11 +106,14 @@ namespace System.Data.Linq {
 #endif
                 }
             }
-            else if (fromType == typeof(Binary)) {
-                if (toType == typeof(Guid)) {
+            else if (fromType == typeof(Binary))
+            {
+                if (toType == typeof(Guid))
+                {
                     return new Guid(((Binary)value).ToArray());
                 }
-                else {
+                else
+                {
 #if NET6_0_OR_GREATER
                     throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
 #else
@@ -108,103 +124,137 @@ namespace System.Data.Linq {
 #endif
                 }
             }
-            else if (toType.IsEnum) {
-                if (fromType == typeof(string)) {
+            else if (toType.IsEnum)
+            {
+                if (fromType == typeof(string))
+                {
                     string text = ((string)value).Trim();
                     return Enum.Parse(toType, text);
                 }
-                else {
+                else
+                {
                     return Enum.ToObject(toType, Convert.ChangeType(value, Enum.GetUnderlyingType(toType), Globalization.CultureInfo.InvariantCulture));
                 }
             }
-            else if (fromType.IsEnum) {
-                if (toType == typeof(string)) {
+            else if (fromType.IsEnum)
+            {
+                if (toType == typeof(string))
+                {
                     return Enum.GetName(fromType, value);
                 }
-                else {
-                    return Convert.ChangeType(Convert.ChangeType(value, 
-                                                                Enum.GetUnderlyingType(fromType), 
-                                                                Globalization.CultureInfo.InvariantCulture), 
+                else
+                {
+                    return Convert.ChangeType(Convert.ChangeType(value,
+                                                                Enum.GetUnderlyingType(fromType),
+                                                                Globalization.CultureInfo.InvariantCulture),
                                               toType,
                                               Globalization.CultureInfo.InvariantCulture);
                 }
             }
-            else if (toType == typeof(TimeSpan)) {
-                if (fromType == typeof(string)) {
+            else if (toType == typeof(TimeSpan))
+            {
+                if (fromType == typeof(string))
+                {
                     return TimeSpan.Parse(value.ToString(), Globalization.CultureInfo.InvariantCulture);
                 }
-                else if (fromType == typeof(DateTime)) {
+                else if (fromType == typeof(DateTime))
+                {
                     return DateTime.Parse(value.ToString(), Globalization.CultureInfo.InvariantCulture).TimeOfDay;
                 }
-                else if (fromType == typeof(DateTimeOffset)) {
+                else if (fromType == typeof(DateTimeOffset))
+                {
                     return DateTimeOffset.Parse(value.ToString(), Globalization.CultureInfo.InvariantCulture).TimeOfDay;
                 }
-                else {
+                else
+                {
                     return new TimeSpan((long)Convert.ChangeType(value, typeof(long), Globalization.CultureInfo.InvariantCulture));
                 }
             }
-            else if (fromType == typeof(TimeSpan)) {
-                if (toType == typeof(string)) {
+            else if (fromType == typeof(TimeSpan))
+            {
+                if (toType == typeof(string))
+                {
                     return ((TimeSpan)value).ToString("", Globalization.CultureInfo.InvariantCulture);
                 }
-                else if (toType == typeof(DateTime)) {
+                else if (toType == typeof(DateTime))
+                {
                     DateTime dt = new DateTime();
                     return dt.Add((TimeSpan)value);
                 }
-                else if (toType == typeof(DateTimeOffset)) {
+                else if (toType == typeof(DateTimeOffset))
+                {
                     DateTimeOffset dto = new DateTimeOffset();
                     return dto.Add((TimeSpan)value);
                 }
-                else {
+                else
+                {
                     return Convert.ChangeType(((TimeSpan)value).Ticks, toType, Globalization.CultureInfo.InvariantCulture);
                 }
             }
-            else if (toType == typeof(DateTime) && fromType == typeof(DateTimeOffset)) {
+            else if (toType == typeof(DateTime) && fromType == typeof(DateTimeOffset))
+            {
                 return ((DateTimeOffset)value).DateTime;
             }
-            else if (toType == typeof(DateTimeOffset) && fromType == typeof(DateTime)) {
+            else if (toType == typeof(DateTimeOffset) && fromType == typeof(DateTime))
+            {
                 return new DateTimeOffset((DateTime)value);
             }
-            else if (toType == typeof(string) && !(typeof(IConvertible).IsAssignableFrom(fromType))) {
-                if (fromType == typeof(char[])) {
+            else if (toType == typeof(string) && !(typeof(IConvertible).IsAssignableFrom(fromType)))
+            {
+                if (fromType == typeof(char[]))
+                {
                     return new String((char[])value);
                 }
-                else {
+                else
+                {
                     return value.ToString();
                 }
             }
-            else if (fromType == typeof(string)) {
-                if (toType == typeof(Guid)) {
+            else if (fromType == typeof(string))
+            {
+                if (toType == typeof(Guid))
+                {
                     return new Guid((string)value);
                 }
-                else if (toType == typeof(char[])) {
+                else if (toType == typeof(char[]))
+                {
                     return ((String)value).ToCharArray();
                 }
-                else if (toType == typeof(System.Xml.Linq.XDocument) && (string)value == string.Empty) {
+                else if (toType == typeof(System.Xml.Linq.XDocument) && (string)value == string.Empty)
+                {
                     return new System.Xml.Linq.XDocument();
                 }
                 else if (!(typeof(IConvertible).IsAssignableFrom(toType)) &&
-                    (mi = toType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, StringArg, null)) != null) {
-                    try {
+                    (mi = toType.GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, StringArg, null)) != null)
+                {
+                    try
+                    {
                         return SecurityUtils.MethodInfoInvoke(mi, null, new object[] { value });
                     }
-                    catch (TargetInvocationException t) {
+                    catch (TargetInvocationException t)
+                    {
                         throw t.GetBaseException();
                     }
                 }
-                else {
+                else
+                {
                     return Convert.ChangeType(value, toType, Globalization.CultureInfo.InvariantCulture);
                 }
             }
             else if (toType.IsGenericType && toType.GetGenericTypeDefinition() == typeof(IQueryable<>)
                 && typeof(IEnumerable<>).MakeGenericType(toType.GetGenericArguments()[0]).IsAssignableFrom(fromType)
-                ) {
+                )
+            {
                 return Queryable.AsQueryable((IEnumerable)value);
             }
-            else {
-                try {
+            else
+            {
+                try
+                {
                     return Convert.ChangeType(value, toType, Globalization.CultureInfo.InvariantCulture);
-                } catch (InvalidCastException) {
+                }
+                catch (InvalidCastException)
+                {
                     throw Error.CouldNotConvert(fromType, toType);
                 }
             }

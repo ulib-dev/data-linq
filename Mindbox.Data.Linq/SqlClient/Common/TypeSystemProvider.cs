@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace System.Data.Linq.SqlClient {
+namespace System.Data.Linq.SqlClient
+{
 
     /// <summary>
     /// Abstracts the provider side type system. Encapsulates:
@@ -12,7 +13,8 @@ namespace System.Data.Linq.SqlClient {
     /// - Type coercion precedence rules.
     /// - Type family organization.
     /// </summary>
-    internal abstract class TypeSystemProvider {
+    internal abstract class TypeSystemProvider
+    {
 
         internal abstract ProviderType PredictTypeForUnary(SqlNodeType unaryOp, ProviderType operandType);
 
@@ -83,7 +85,8 @@ namespace System.Data.Linq.SqlClient {
     /// Flags control the format of string returned by ToQueryString().
     /// </summary>
     [Flags]
-    internal enum QueryFormatOptions {
+    internal enum QueryFormatOptions
+    {
         None = 0,
         SuppressSize = 1
     }
@@ -91,7 +94,8 @@ namespace System.Data.Linq.SqlClient {
     /// <summary>
     /// An abstract type exposed by the TypeSystemProvider.
     /// </summary>
-    internal abstract class ProviderType {
+    internal abstract class ProviderType
+    {
 
         /// <summary>
         /// True if this type is a Unicode type (eg, ntext, etc).
@@ -234,9 +238,10 @@ namespace System.Data.Linq.SqlClient {
         /// all these types have length less than the default sized used by SqlServer,
         /// so the length specification can be omitted without fear of truncation.
         /// </summary>
-        internal abstract bool CanSuppressSizeForConversionToString{ get; }
+        internal abstract bool CanSuppressSizeForConversionToString { get; }
 
-        public static bool operator ==(ProviderType typeA, ProviderType typeB) {
+        public static bool operator ==(ProviderType typeA, ProviderType typeB)
+        {
             if ((object)typeA == (object)typeB)
                 return true;
             if ((object)typeA != null)
@@ -244,7 +249,8 @@ namespace System.Data.Linq.SqlClient {
             return false;
         }
 
-        public static bool operator != (ProviderType typeA, ProviderType typeB) {
+        public static bool operator !=(ProviderType typeA, ProviderType typeB)
+        {
             if ((object)typeA == (object)typeB)
                 return false;
             if ((object)typeA != null)
@@ -252,11 +258,13 @@ namespace System.Data.Linq.SqlClient {
             return true;
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             return base.Equals(obj);
         }
 
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             return base.GetHashCode();
         }
     }

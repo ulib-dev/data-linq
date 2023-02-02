@@ -10,17 +10,22 @@ using System.Data.Linq.Mapping;
 using System.Data.Linq.Provider;
 using System.Diagnostics.CodeAnalysis;
 
-namespace System.Data.Linq.SqlClient {
+namespace System.Data.Linq.SqlClient
+{
 
     /// <summary>
     /// Method used for dealing with dynamic types. The ClrType of SqlNode is the 
     /// statically known type originating in the source expression tree. For methods
     /// like GetType(), we need to know the dynamic type that will be constructed.
     /// </summary>
-    internal static class TypeSource {
-        private class Visitor : SqlVisitor {
-            class UnwrapStack {
-                public UnwrapStack(UnwrapStack last, bool unwrap) {
+    internal static class TypeSource
+    {
+        private class Visitor : SqlVisitor
+        {
+            class UnwrapStack
+            {
+                public UnwrapStack(UnwrapStack last, bool unwrap)
+                {
                     Last = last;
                     Unwrap = unwrap;
                 }
@@ -30,31 +35,38 @@ namespace System.Data.Linq.SqlClient {
             UnwrapStack UnwrapSequences;
             internal SqlExpression sourceExpression;
             internal Type sourceType;
-            [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification="These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
-            internal override SqlNode Visit(SqlNode node) {
+            [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
+            internal override SqlNode Visit(SqlNode node)
+            {
                 if (node == null)
                     return null;
 
                 sourceExpression = node as SqlExpression;
-                if (sourceExpression != null) {
+                if (sourceExpression != null)
+                {
                     Type type = sourceExpression.ClrType;
                     UnwrapStack unwrap = this.UnwrapSequences;
-                    while (unwrap != null) {
-                        if (unwrap.Unwrap) {
+                    while (unwrap != null)
+                    {
+                        if (unwrap.Unwrap)
+                        {
                             type = TypeSystem.GetElementType(type);
                         }
                         unwrap = unwrap.Last;
                     }
                     sourceType = type;
                 }
-                if (sourceType != null && TypeSystem.GetNonNullableType(sourceType).IsValueType) {
+                if (sourceType != null && TypeSystem.GetNonNullableType(sourceType).IsValueType)
+                {
                     return node; // Value types can't also have a dynamic type.
                 }
-                if (sourceType != null && TypeSystem.HasIEnumerable(sourceType)) {
+                if (sourceType != null && TypeSystem.HasIEnumerable(sourceType))
+                {
                     return node; // Sequences can't be polymorphic.
                 }
 
-                switch (node.NodeType) {
+                switch (node.NodeType)
+                {
                     case SqlNodeType.ScalarSubSelect:
                     case SqlNodeType.Multiset:
                     case SqlNodeType.Element:
@@ -80,7 +92,8 @@ namespace System.Data.Linq.SqlClient {
                         return node;
                     case SqlNodeType.Value:
                         SqlValue val = (SqlValue)node;
-                        if (val.Value != null) {
+                        if (val.Value != null)
+                        {
                             // In some cases the ClrType of a Value node may
                             // differ from the actual runtime type of the value.
                             // Therefore, we ensure here that the correct type is set.
@@ -90,7 +103,8 @@ namespace System.Data.Linq.SqlClient {
                 }
                 return base.Visit(node);
             }
-            internal override SqlSelect VisitSelect(SqlSelect select) {
+            internal override SqlSelect VisitSelect(SqlSelect select)
+            {
                 /*
                  * We're travelling through <expression> of something like:
                  * 
@@ -114,17 +128,22 @@ namespace System.Data.Linq.SqlClient {
                 this.UnwrapSequences = this.UnwrapSequences.Last;
                 return select;
             }
-            internal override SqlExpression VisitAliasRef(SqlAliasRef aref) {
-                if (this.UnwrapSequences != null && this.UnwrapSequences.Unwrap) {
+            internal override SqlExpression VisitAliasRef(SqlAliasRef aref)
+            {
+                if (this.UnwrapSequences != null && this.UnwrapSequences.Unwrap)
+                {
                     this.UnwrapSequences = new UnwrapStack(this.UnwrapSequences, false);
                     this.VisitAlias(aref.Alias);
                     this.UnwrapSequences = this.UnwrapSequences.Last;
-                } else {
+                }
+                else
+                {
                     this.VisitAlias(aref.Alias);
                 }
                 return aref;
             }
-            internal override SqlExpression VisitColumnRef(SqlColumnRef cref) {
+            internal override SqlExpression VisitColumnRef(SqlColumnRef cref)
+            {
                 this.VisitColumn(cref.Column); // Travel through column references
                 return cref;
             }
@@ -133,7 +152,8 @@ namespace System.Data.Linq.SqlClient {
         /// <summary>
         /// Get a MetaType that represents the dynamic type of the given node.
         /// </summary>
-        internal static MetaType GetSourceMetaType(SqlNode node, MetaModel model) {
+        internal static MetaType GetSourceMetaType(SqlNode node, MetaModel model)
+        {
             Visitor v = new Visitor();
             v.Visit(node);
             Type type = v.sourceType;
@@ -146,7 +166,8 @@ namespace System.Data.Linq.SqlClient {
         /// given expression. This is either a SqlDiscriminatedType or a SqlValue
         /// of type Type.
         /// </summary>
-        internal static SqlExpression GetTypeSource(SqlExpression expr) {
+        internal static SqlExpression GetTypeSource(SqlExpression expr)
+        {
             Visitor v = new Visitor();
             v.Visit(expr);
             return v.sourceExpression;

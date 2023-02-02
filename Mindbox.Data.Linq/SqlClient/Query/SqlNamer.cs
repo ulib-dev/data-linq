@@ -4,36 +4,44 @@ using System.Text;
 using System.Data.Linq;
 using System.Diagnostics.CodeAnalysis;
 
-namespace System.Data.Linq.SqlClient {
+namespace System.Data.Linq.SqlClient
+{
 
-    internal class SqlNamer {
+    internal class SqlNamer
+    {
         Visitor visitor;
 
-        internal SqlNamer() {
+        internal SqlNamer()
+        {
             this.visitor = new Visitor();
         }
 
-        internal SqlNode AssignNames(SqlNode node) {
+        internal SqlNode AssignNames(SqlNode node)
+        {
             return this.visitor.Visit(node);
         }
 
-        class Visitor : SqlVisitor {
+        class Visitor : SqlVisitor
+        {
             int aliasCount;
             SqlAlias alias;
             bool makeUnique;
             bool useMappedNames;
             string lastName;
 
-            internal Visitor() {
+            internal Visitor()
+            {
                 this.makeUnique = true;
                 this.useMappedNames = false;
             }
 
-            internal string GetNextAlias() {
+            internal string GetNextAlias()
+            {
                 return "t" + (aliasCount++);
             }
 
-            internal override SqlAlias VisitAlias(SqlAlias sqlAlias) {
+            internal override SqlAlias VisitAlias(SqlAlias sqlAlias)
+            {
                 SqlAlias save = this.alias;
                 this.alias = sqlAlias;
                 sqlAlias.Node = this.Visit(sqlAlias.Node);
@@ -42,9 +50,11 @@ namespace System.Data.Linq.SqlClient {
                 return sqlAlias;
             }
 
-            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss) {
+            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss)
+            {
                 base.VisitScalarSubSelect(ss);
-                if (ss.Select.Row.Columns.Count > 0) {
+                if (ss.Select.Row.Columns.Count > 0)
+                {
                     System.Diagnostics.Debug.Assert(ss != null && ss.Select != null && ss.Select.Row != null && ss.Select.Row.Columns.Count == 1);
                     // make sure these scalar subselects don't get redundantly named
                     ss.Select.Row.Columns[0].Name = "";
@@ -52,7 +62,8 @@ namespace System.Data.Linq.SqlClient {
                 return ss;
             }
 
-            internal override SqlStatement VisitInsert(SqlInsert insert) {
+            internal override SqlStatement VisitInsert(SqlInsert insert)
+            {
                 bool saveMakeUnique = this.makeUnique;
                 this.makeUnique = false;
                 bool saveUseMappedNames = this.useMappedNames;
@@ -63,7 +74,8 @@ namespace System.Data.Linq.SqlClient {
                 return stmt;
             }
 
-            internal override SqlStatement VisitUpdate(SqlUpdate update) {
+            internal override SqlStatement VisitUpdate(SqlUpdate update)
+            {
                 bool saveMakeUnique = this.makeUnique;
                 this.makeUnique = false;
                 bool saveUseMappedNames = this.useMappedNames;
@@ -74,29 +86,35 @@ namespace System.Data.Linq.SqlClient {
                 return stmt;
             }
 
-            internal override SqlSelect VisitSelect(SqlSelect select) {
+            internal override SqlSelect VisitSelect(SqlSelect select)
+            {
                 select = base.VisitSelect(select);
 
                 string[] names = new string[select.Row.Columns.Count];
-                for (int i = 0, n = names.Length; i < n; i++) {
+                for (int i = 0, n = names.Length; i < n; i++)
+                {
                     SqlColumn c = select.Row.Columns[i];
                     string name = c.Name;
-                    if (name == null) {
+                    if (name == null)
+                    {
                         name = SqlNamer.DiscoverName(c);
                     }
                     names[i] = name;
                     c.Name = null;
                 }
-                
+
                 var reservedNames = this.GetColumnNames(select.OrderBy);
 
-                for (int i = 0, n = select.Row.Columns.Count; i < n; i++) {
+                for (int i = 0, n = select.Row.Columns.Count; i < n; i++)
+                {
                     SqlColumn c = select.Row.Columns[i];
                     string rootName = names[i];
                     string name = rootName;
-                    if (this.makeUnique) {
+                    if (this.makeUnique)
+                    {
                         int iName = 1;
-                        while (!this.IsUniqueName(select.Row.Columns, reservedNames, c, name)) {
+                        while (!this.IsUniqueName(select.Row.Columns, reservedNames, c, name))
+                        {
                             iName++;
                             name = rootName + iName;
                         }
@@ -108,14 +126,17 @@ namespace System.Data.Linq.SqlClient {
                 return select;
             }
 
-            [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification="Unknown reason.")]
-            private bool IsUniqueName(List<SqlColumn> columns, ICollection<string> reservedNames, SqlColumn c, string name) {
-                foreach (SqlColumn sc in columns) {
+            [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Unknown reason.")]
+            private bool IsUniqueName(List<SqlColumn> columns, ICollection<string> reservedNames, SqlColumn c, string name)
+            {
+                foreach (SqlColumn sc in columns)
+                {
                     if (sc != c && string.Compare(sc.Name, name, StringComparison.OrdinalIgnoreCase) == 0)
                         return false;
                 }
 
-                if (!IsSimpleColumn(c, name)) {
+                if (!IsSimpleColumn(c, name))
+                {
                     return !reservedNames.Contains(name);
                 }
 
@@ -129,9 +150,12 @@ namespace System.Data.Linq.SqlClient {
             /// </summary>
             /// <param name="c"></param>
             /// <returns></returns>
-            private static bool IsSimpleColumn(SqlColumn c, string name) {
-                if (c.Expression != null) {
-                    switch (c.Expression.NodeType) {
+            private static bool IsSimpleColumn(SqlColumn c, string name)
+            {
+                if (c.Expression != null)
+                {
+                    switch (c.Expression.NodeType)
+                    {
                         case SqlNodeType.ColumnRef:
                             var colRef = c.Expression as SqlColumnRef;
                             return String.IsNullOrEmpty(name) || string.Compare(name, colRef.Column.Name, StringComparison.OrdinalIgnoreCase) == 0;
@@ -142,50 +166,65 @@ namespace System.Data.Linq.SqlClient {
                 return true;
             }
 
-            internal override SqlExpression VisitExpression(SqlExpression expr) {
+            internal override SqlExpression VisitExpression(SqlExpression expr)
+            {
                 string saveLastName = this.lastName;
                 this.lastName = null;
-                try {
+                try
+                {
                     return (SqlExpression)this.Visit(expr);
                 }
-                finally {
+                finally
+                {
                     this.lastName = saveLastName;
                 }
             }
 
-            private SqlExpression VisitNamedExpression(SqlExpression expr, string name) {
+            private SqlExpression VisitNamedExpression(SqlExpression expr, string name)
+            {
                 string saveLastName = this.lastName;
                 this.lastName = name;
-                try {
+                try
+                {
                     return (SqlExpression)this.Visit(expr);
                 }
-                finally {
+                finally
+                {
                     this.lastName = saveLastName;
                 }
             }
 
-            internal override SqlExpression VisitColumnRef(SqlColumnRef cref) {
-                if (cref.Column.Name == null && this.lastName != null) {
+            internal override SqlExpression VisitColumnRef(SqlColumnRef cref)
+            {
+                if (cref.Column.Name == null && this.lastName != null)
+                {
                     cref.Column.Name = this.lastName;
                 }
                 return cref;
             }
 
-            internal override SqlExpression VisitNew(SqlNew sox) {
-                if (sox.Constructor != null) {
+            internal override SqlExpression VisitNew(SqlNew sox)
+            {
+                if (sox.Constructor != null)
+                {
                     System.Reflection.ParameterInfo[] pis = sox.Constructor.GetParameters();
-                    for (int i = 0, n = sox.Args.Count; i < n; i++) {
+                    for (int i = 0, n = sox.Args.Count; i < n; i++)
+                    {
                         sox.Args[i] = this.VisitNamedExpression(sox.Args[i], pis[i].Name);
                     }
                 }
-                else {
-                    for (int i = 0, n = sox.Args.Count; i < n; i++) {
+                else
+                {
+                    for (int i = 0, n = sox.Args.Count; i < n; i++)
+                    {
                         sox.Args[i] = this.VisitExpression(sox.Args[i]);
                     }
                 }
-                foreach (SqlMemberAssign ma in sox.Members) {
+                foreach (SqlMemberAssign ma in sox.Members)
+                {
                     string n = ma.Member.Name;
-                    if (this.useMappedNames) {
+                    if (this.useMappedNames)
+                    {
                         n = sox.MetaType.GetDataMember(ma.Member).MappedName;
                     }
                     ma.Expression = this.VisitNamedExpression(ma.Expression, n);
@@ -193,22 +232,26 @@ namespace System.Data.Linq.SqlClient {
                 return sox;
             }
 
-            internal override SqlExpression VisitGrouping(SqlGrouping g) {
+            internal override SqlExpression VisitGrouping(SqlGrouping g)
+            {
                 g.Key = this.VisitNamedExpression(g.Key, "Key");
                 g.Group = this.VisitNamedExpression(g.Group, "Group");
                 return g;
             }
 
-            internal override SqlExpression VisitOptionalValue(SqlOptionalValue sov) {
+            internal override SqlExpression VisitOptionalValue(SqlOptionalValue sov)
+            {
                 sov.HasValue = this.VisitNamedExpression(sov.HasValue, "test");
                 sov.Value = this.VisitExpression(sov.Value);
                 return sov;
             }
 
-            internal override SqlExpression VisitMethodCall(SqlMethodCall mc) {
+            internal override SqlExpression VisitMethodCall(SqlMethodCall mc)
+            {
                 mc.Object = this.VisitExpression(mc.Object);
                 System.Reflection.ParameterInfo[] pis = mc.Method.GetParameters();
-                for (int i = 0, n = mc.Arguments.Count; i < n; i++) {
+                for (int i = 0, n = mc.Arguments.Count; i < n; i++)
+                {
                     mc.Arguments[i] = this.VisitNamedExpression(mc.Arguments[i], pis[i].Name);
                 }
                 return mc;
@@ -219,7 +262,8 @@ namespace System.Data.Linq.SqlClient {
             {
                 var visitor = new ColumnNameGatherer();
 
-                foreach (var expr in orderList) {
+                foreach (var expr in orderList)
+                {
                     visitor.Visit(expr.Expression);
                 }
 
@@ -227,9 +271,12 @@ namespace System.Data.Linq.SqlClient {
             }
         }
 
-        internal static string DiscoverName(SqlExpression e) {
-            if (e != null) {
-                switch (e.NodeType) {
+        internal static string DiscoverName(SqlExpression e)
+        {
+            if (e != null)
+            {
+                switch (e.NodeType)
+                {
                     case SqlNodeType.Column:
                         return DiscoverName(((SqlColumn)e).Expression);
                     case SqlNodeType.ColumnRef:
@@ -243,24 +290,29 @@ namespace System.Data.Linq.SqlClient {
             }
             return "value";
         }
-        
-        class ColumnNameGatherer : SqlVisitor {
+
+        class ColumnNameGatherer : SqlVisitor
+        {
             public HashSet<string> Names { get; set; }
 
             public ColumnNameGatherer()
-                : base() {
+                : base()
+            {
                 this.Names = new HashSet<string>();
             }
 
-            internal override SqlExpression VisitColumn(SqlColumn col) {
-                if (!String.IsNullOrEmpty(col.Name)) {
+            internal override SqlExpression VisitColumn(SqlColumn col)
+            {
+                if (!String.IsNullOrEmpty(col.Name))
+                {
                     this.Names.Add(col.Name);
                 }
 
                 return base.VisitColumn(col);
             }
 
-            internal override SqlExpression VisitColumnRef(SqlColumnRef cref) {
+            internal override SqlExpression VisitColumnRef(SqlColumnRef cref)
+            {
                 Visit(cref.Column);
 
                 return base.VisitColumnRef(cref);

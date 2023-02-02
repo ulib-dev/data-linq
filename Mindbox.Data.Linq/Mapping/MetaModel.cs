@@ -4,18 +4,18 @@ using System.Reflection;
 using System.Text;
 using System.Linq;
 
-namespace System.Data.Linq.Mapping 
+namespace System.Data.Linq.Mapping
 {
     /// <summary>
     /// A MetaModel is an abstraction representing the mapping between a database and domain objects
     /// </summary>
-    public abstract class MetaModel 
-	{
-		/// <summary>
-		/// Internal value used to determine a reference identity for comparing meta models
-		/// without needing to keep track of the actual meta model reference.
-		/// </summary>
-		private readonly object identity = new object();
+    public abstract class MetaModel
+    {
+        /// <summary>
+        /// Internal value used to determine a reference identity for comparing meta models
+        /// without needing to keep track of the actual meta model reference.
+        /// </summary>
+        private readonly object identity = new object();
 
 
         /// <summary>
@@ -39,10 +39,10 @@ namespace System.Data.Linq.Mapping
         public abstract Type ProviderType { get; }
 
 
-		internal object Identity
-		{
-			get { return identity; }
-		}
+        internal object Identity
+        {
+            get { return identity; }
+        }
 
 
         /// <summary>
@@ -73,35 +73,35 @@ namespace System.Data.Linq.Mapping
         public abstract MetaType GetMetaType(Type type);
 
 
-	    internal virtual bool ShouldEntityProxyBeCreated(Type entityType)
-	    {
-		    if (entityType == null)
-			    throw new ArgumentNullException("entityType");
+        internal virtual bool ShouldEntityProxyBeCreated(Type entityType)
+        {
+            if (entityType == null)
+                throw new ArgumentNullException("entityType");
 
-		    return false;
-	    }
+            return false;
+        }
 
-		internal virtual object CreateEntityProxy(Type entityType)
-	    {
-		    if (entityType == null)
-			    throw new ArgumentNullException("entityType");
+        internal virtual object CreateEntityProxy(Type entityType)
+        {
+            if (entityType == null)
+                throw new ArgumentNullException("entityType");
 
-		    throw new NotSupportedException();
-	    }
+            throw new NotSupportedException();
+        }
 
-		internal virtual Type UnproxyType(Type type)
-		{
-			if (type == null)
-				throw new ArgumentNullException("type");
+        internal virtual Type UnproxyType(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
 
-			return type;
-		}
+            return type;
+        }
 
-	    internal T CreateObject<T>()
-	    {
-		    if (ShouldEntityProxyBeCreated(typeof(T)))
-			    return (T)CreateEntityProxy(typeof(T));
-		    return Activator.CreateInstance<T>();
-	    }
-	}
+        internal T CreateObject<T>()
+        {
+            if (ShouldEntityProxyBeCreated(typeof(T)))
+                return (T)CreateEntityProxy(typeof(T));
+            return Activator.CreateInstance<T>();
+        }
+    }
 }

@@ -10,11 +10,13 @@ using System.Reflection;
 using System.Text;
 using System.Transactions;
 
-namespace System.Data.Linq.SqlClient {
+namespace System.Data.Linq.SqlClient
+{
     using System.Data.Linq;
     using System.Data.Linq.Provider;
 
-    internal class SqlConnectionManager : IConnectionManager {
+    internal class SqlConnectionManager : IConnectionManager
+    {
         private IProvider provider;
         private DbConnection connection;
         private bool autoClose;
@@ -25,7 +27,8 @@ namespace System.Data.Linq.SqlClient {
         private List<IConnectionUser> users;
         private int maxUsers;
 
-        internal SqlConnectionManager(IProvider provider, DbConnection con, int maxUsers, bool disposeConnection) {
+        internal SqlConnectionManager(IProvider provider, DbConnection con, int maxUsers, bool disposeConnection)
+        {
             this.provider = provider;
             this.connection = con;
             this.maxUsers = maxUsers;
@@ -35,85 +38,105 @@ namespace System.Data.Linq.SqlClient {
         }
 
 
-        public DbConnection UseConnection(IConnectionUser user) {
-            if (user == null) {
+        public DbConnection UseConnection(IConnectionUser user)
+        {
+            if (user == null)
+            {
                 throw Error.ArgumentNull("user");
             }
-            if (this.connection.State == ConnectionState.Closed) {
+            if (this.connection.State == ConnectionState.Closed)
+            {
                 this.connection.Open();
                 this.autoClose = true;
                 this.AddInfoMessageHandler();
-                if (System.Transactions.Transaction.Current != null) {
+                if (System.Transactions.Transaction.Current != null)
+                {
                     System.Transactions.Transaction.Current.TransactionCompleted += this.OnTransactionCompleted;
                 }
             }
             if (this.transaction == null && System.Transactions.Transaction.Current != null &&
-                        System.Transactions.Transaction.Current != systemTransaction) {
+                        System.Transactions.Transaction.Current != systemTransaction)
+            {
                 this.ClearConnection();
                 systemTransaction = System.Transactions.Transaction.Current;
                 this.connection.EnlistTransaction(System.Transactions.Transaction.Current);
             }
 
-            if (this.users.Count == this.maxUsers) {
+            if (this.users.Count == this.maxUsers)
+            {
                 this.BootUser(this.users[0]);
             }
             this.users.Add(user);
             return this.connection;
         }
 
-        private void BootUser(IConnectionUser user) {
+        private void BootUser(IConnectionUser user)
+        {
             bool saveAutoClose = this.autoClose;
             this.autoClose = false;
             int index = this.users.IndexOf(user);
-            if (index >= 0) {
+            if (index >= 0)
+            {
                 this.users.RemoveAt(index);
             }
             user.CompleteUse();
             this.autoClose = saveAutoClose;
         }
 
-        internal DbConnection Connection {
+        internal DbConnection Connection
+        {
             get { return this.connection; }
         }
 
-        internal int MaxUsers {
+        internal int MaxUsers
+        {
             get { return this.maxUsers; }
         }
 
-        internal void DisposeConnection() {
+        internal void DisposeConnection()
+        {
             // only close this guy if we opened it in the first place
-            if (this.autoClose) {
+            if (this.autoClose)
+            {
                 this.CloseConnection();
             }
 
             // If we created the connection, we need to dispose it even if the user explicitly
             // opened it using the Connection property on the context.
-            if (this.connection != null && this.disposeConnection) {
+            if (this.connection != null && this.disposeConnection)
+            {
                 this.connection.Dispose();
                 this.connection = null;
             }
         }
 
-        internal void ClearConnection() {
-            while (this.users.Count > 0) {
+        internal void ClearConnection()
+        {
+            while (this.users.Count > 0)
+            {
                 this.BootUser(this.users[0]);
             }
         }
 
-        internal bool AutoClose {
+        internal bool AutoClose
+        {
             get { return this.autoClose; }
             set { this.autoClose = value; }
         }
 
-        internal DbTransaction Transaction {
+        internal DbTransaction Transaction
+        {
             get { return this.transaction; }
-            set {
-                if (value != this.transaction) {
-                    if (value != null) {
+            set
+            {
+                if (value != this.transaction)
+                {
+                    if (value != null)
+                    {
                         if (this.connection != value.Connection)
                         {
-	                        var exception = Error.TransactionDoesNotMatchConnection();
-	                        AddAdditionalExceptionInformation(exception, this, value);
+                            var exception = Error.TransactionDoesNotMatchConnection();
+                            AddAdditionalExceptionInformation(exception, this, value);
 
                             throw exception;
                         }
@@ -124,77 +147,91 @@ namespace System.Data.Linq.SqlClient {
         }
 
         private void AddAdditionalExceptionInformation(
-	        Exception exception, SqlConnectionManager sqlConnectionManager, DbTransaction value)
+            Exception exception, SqlConnectionManager sqlConnectionManager, DbTransaction value)
         {
-	        exception.Data["TransactionToSetInfo"] = GetTransactionInformation(value);
-	        exception.Data["ConnectionManagerConnectionInfo"] = GetConnectionInfo(sqlConnectionManager.Connection);
-	        exception.Data["ConnectionManagerTransactionInfo"] = GetTransactionInformation(sqlConnectionManager.Transaction);
+            exception.Data["TransactionToSetInfo"] = GetTransactionInformation(value);
+            exception.Data["ConnectionManagerConnectionInfo"] = GetConnectionInfo(sqlConnectionManager.Connection);
+            exception.Data["ConnectionManagerTransactionInfo"] = GetTransactionInformation(sqlConnectionManager.Transaction);
         }
 
         private string GetTransactionInformation(DbTransaction value)
         {
-	        if (value == null)
-		        return "Transaction is null";
+            if (value == null)
+                return "Transaction is null";
 
-	        return $"TransactionHashCode: {value.GetHashCode()}\r\n" +
-	               $"TransactionIsolationLevel: {value.IsolationLevel}\r\n" +
-	               "Transaction connection details: " + GetConnectionInfo(value.Connection) + "\r\n";
+            return $"TransactionHashCode: {value.GetHashCode()}\r\n" +
+                   $"TransactionIsolationLevel: {value.IsolationLevel}\r\n" +
+                   "Transaction connection details: " + GetConnectionInfo(value.Connection) + "\r\n";
         }
 
         private string GetConnectionInfo(DbConnection valueConnection)
         {
-	        if (valueConnection == null)
-		        return "Connection is null";
+            if (valueConnection == null)
+                return "Connection is null";
 
-	        return $"ConnectionHashCode: {valueConnection.GetHashCode()}\r\n" +
-	               $"DataSource: {valueConnection.DataSource}\r\n" +
-	               $"ConnectionString: {valueConnection.ConnectionString}\r\n" +
-	               $"State: {valueConnection.State}\r\n";
+            return $"ConnectionHashCode: {valueConnection.GetHashCode()}\r\n" +
+                   $"DataSource: {valueConnection.DataSource}\r\n" +
+                   $"ConnectionString: {valueConnection.ConnectionString}\r\n" +
+                   $"State: {valueConnection.State}\r\n";
         }
 
-        public void ReleaseConnection(IConnectionUser user) {
-            if (user == null) {
+        public void ReleaseConnection(IConnectionUser user)
+        {
+            if (user == null)
+            {
                 throw Error.ArgumentNull("user");
             }
             int index = this.users.IndexOf(user);
-            if (index >= 0) {
+            if (index >= 0)
+            {
                 this.users.RemoveAt(index);
             }
-            if (this.users.Count == 0 && this.autoClose && this.transaction == null && System.Transactions.Transaction.Current == null) {
+            if (this.users.Count == 0 && this.autoClose && this.transaction == null && System.Transactions.Transaction.Current == null)
+            {
                 this.CloseConnection();
             }
         }
 
-        private void CloseConnection() {
-            if (this.connection != null && this.connection.State != ConnectionState.Closed) {
+        private void CloseConnection()
+        {
+            if (this.connection != null && this.connection.State != ConnectionState.Closed)
+            {
                 this.connection.Close();
             }
             this.RemoveInfoMessageHandler();
             this.autoClose = false;
         }
 
-        private void OnInfoMessage(object sender, SqlInfoMessageEventArgs args) {
-            if (this.provider.Log != null) {
+        private void OnInfoMessage(object sender, SqlInfoMessageEventArgs args)
+        {
+            if (this.provider.Log != null)
+            {
                 this.provider.Log.WriteLine(Strings.LogGeneralInfoMessage(args.Source, args.Message));
             }
         }
 
-        private void OnTransactionCompleted(object sender, System.Transactions.TransactionEventArgs args) {
-            if (this.users.Count == 0 && this.autoClose) {
+        private void OnTransactionCompleted(object sender, System.Transactions.TransactionEventArgs args)
+        {
+            if (this.users.Count == 0 && this.autoClose)
+            {
                 this.CloseConnection();
             }
         }
 
-        private void AddInfoMessageHandler() {
+        private void AddInfoMessageHandler()
+        {
             SqlConnection scon = this.connection as SqlConnection;
-            if (scon != null) {
+            if (scon != null)
+            {
                 scon.InfoMessage += this.infoMessagehandler;
             }
         }
 
-        private void RemoveInfoMessageHandler() {
+        private void RemoveInfoMessageHandler()
+        {
             SqlConnection scon = this.connection as SqlConnection;
-            if (scon != null) {
+            if (scon != null)
+            {
                 scon.InfoMessage -= this.infoMessagehandler;
             }
         }

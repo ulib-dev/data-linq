@@ -2,8 +2,8 @@
 
 namespace Mindbox.Data.Linq
 {
-	public static class Configuration
-	{
+    public static class Configuration
+    {
 
-	}
+    }
 }

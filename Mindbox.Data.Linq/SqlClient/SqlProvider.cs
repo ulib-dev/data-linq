@@ -21,15 +21,19 @@ using Me = System.Data.Linq.SqlClient;
 using System.Runtime.Versioning;
 using System.Runtime.CompilerServices;
 
-namespace System.Data.Linq.SqlClient {
-    public sealed class Sql2008Provider : SqlProvider {
+namespace System.Data.Linq.SqlClient
+{
+    public sealed class Sql2008Provider : SqlProvider
+    {
         public Sql2008Provider()
-            : base(ProviderMode.Sql2008) {
+            : base(ProviderMode.Sql2008)
+        {
         }
     }
 
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification="Unknown reason.")]
-    public class SqlProvider : IReaderProvider, IConnectionUser {
+    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Unknown reason.")]
+    public class SqlProvider : IReaderProvider, IConnectionUser
+    {
         private IDataServices services;
         private SqlConnectionManager conManager;
         private TypeSystemProvider typeProvider;
@@ -52,7 +56,8 @@ namespace System.Data.Linq.SqlClient {
         private bool deleted = false;
 
 
-        internal enum ProviderMode {
+        internal enum ProviderMode
+        {
             NotYetDecided,
             Sql2008,
         }
@@ -60,21 +65,27 @@ namespace System.Data.Linq.SqlClient {
         const string CommandTextKey = "SqlCommandText";
         const string CommandParametersKey = "SqlParameters";
 
-        internal ProviderMode Mode {
-            get {
+        internal ProviderMode Mode
+        {
+            get
+            {
                 this.CheckDispose();
                 this.CheckInitialized();
                 this.InitializeProviderMode();
-                return this.mode; 
+                return this.mode;
             }
         }
-        
-        private void InitializeProviderMode() {
-            if (this.mode == ProviderMode.NotYetDecided) {
+
+        private void InitializeProviderMode()
+        {
+            if (this.mode == ProviderMode.NotYetDecided)
+            {
                 this.mode = ProviderMode.Sql2008;
             }
-            if (this.typeProvider == null) {
-                switch (this.mode) {
+            if (this.typeProvider == null)
+            {
+                switch (this.mode)
+                {
                     case ProviderMode.Sql2008:
                         this.typeProvider = SqlTypeSystem.Create2008Provider();
                         break;
@@ -83,55 +94,67 @@ namespace System.Data.Linq.SqlClient {
                         break;
                 }
             }
-            if (this.sqlFactory == null) {
+            if (this.sqlFactory == null)
+            {
                 this.sqlFactory = new SqlFactory(this.typeProvider, this.services.Model);
                 this.translator = new Translator(this.services, this.sqlFactory, this.typeProvider);
             }
         }
 
-        DbConnection IProvider.Connection {
-            get {
+        DbConnection IProvider.Connection
+        {
+            get
+            {
                 this.CheckDispose();
                 this.CheckInitialized();
                 return this.conManager.Connection;
             }
         }
 
-        TextWriter IProvider.Log {
-            get {
+        TextWriter IProvider.Log
+        {
+            get
+            {
                 this.CheckDispose();
                 this.CheckInitialized();
                 return this.log;
             }
-            set {
+            set
+            {
                 this.CheckDispose();
                 this.CheckInitialized();
                 this.log = value;
             }
         }
 
-        DbTransaction IProvider.Transaction {
-            get {
+        DbTransaction IProvider.Transaction
+        {
+            get
+            {
                 this.CheckDispose();
                 this.CheckInitialized();
                 return this.conManager.Transaction;
             }
-            set {
+            set
+            {
                 this.CheckDispose();
                 this.CheckInitialized();
                 this.conManager.Transaction = value;
             }
         }
 
-        int IProvider.CommandTimeout {
-            get {
+        int IProvider.CommandTimeout
+        {
+            get
+            {
                 this.CheckDispose();
-                return this.commandTimeout; 
+                return this.commandTimeout;
             }
-            set {
+            set
+            {
                 this.CheckDispose();
-                this.commandTimeout = value; 
-            } 
+                this.commandTimeout = value;
+            }
         }
 
         string IProvider.StatementLabel
@@ -151,86 +174,109 @@ namespace System.Data.Linq.SqlClient {
         /// <summary>
         /// Expose a test hook which controls which SQL optimizations are executed.
         /// </summary>
-        internal OptimizationFlags OptimizationFlags {
-            get { 
+        internal OptimizationFlags OptimizationFlags
+        {
+            get
+            {
                 CheckDispose();
-                return this.optimizationFlags; 
+                return this.optimizationFlags;
             }
-            set { 
+            set
+            {
                 CheckDispose();
-                this.optimizationFlags = value; 
+                this.optimizationFlags = value;
             }
         }
 
         /// <summary>
         /// Validate queries as they are generated.
         /// </summary>
-        internal bool CheckQueries {
-            get { 
+        internal bool CheckQueries
+        {
+            get
+            {
                 CheckDispose();
-                return checkQueries; 
+                return checkQueries;
             }
-            set { 
+            set
+            {
                 CheckDispose();
-                checkQueries = value; 
-            }
-        }
-
-        internal bool EnableCacheLookup {
-            get { 
-                CheckDispose();
-                return this.enableCacheLookup; 
-            }
-            set { 
-                CheckDispose();
-                this.enableCacheLookup = value; 
+                checkQueries = value;
             }
         }
 
-        internal int QueryCount {
-            get { 
+        internal bool EnableCacheLookup
+        {
+            get
+            {
                 CheckDispose();
-                return this.queryCount; 
+                return this.enableCacheLookup;
+            }
+            set
+            {
+                CheckDispose();
+                this.enableCacheLookup = value;
             }
         }
 
-        internal int MaxUsers {
-            get {
+        internal int QueryCount
+        {
+            get
+            {
+                CheckDispose();
+                return this.queryCount;
+            }
+        }
+
+        internal int MaxUsers
+        {
+            get
+            {
                 CheckDispose();
                 return this.conManager.MaxUsers;
             }
         }
 
-        IDataServices IReaderProvider.Services {
+        IDataServices IReaderProvider.Services
+        {
             get { return this.services; }
         }
 
-        IConnectionManager IReaderProvider.ConnectionManager {
+        IConnectionManager IReaderProvider.ConnectionManager
+        {
             get { return this.conManager; }
         }
 
-        public SqlProvider() {
+        public SqlProvider()
+        {
             this.mode = ProviderMode.NotYetDecided;
         }
 
-        internal SqlProvider(ProviderMode mode) {
+        internal SqlProvider(ProviderMode mode)
+        {
             this.mode = mode;
         }
 
-        private void CheckInitialized() {
-            if (this.services == null) {
+        private void CheckInitialized()
+        {
+            if (this.services == null)
+            {
                 throw Error.ContextNotInitialized();
             }
         }
-        private void CheckNotDeleted() {
-            if (this.deleted) {
+        private void CheckNotDeleted()
+        {
+            if (this.deleted)
+            {
                 throw Error.DatabaseDeleteThroughContext();
             }
         }
 
         [ResourceExposure(ResourceScope.Machine)] // connection parameter may refer to filenames.
-        void IProvider.Initialize(IDataServices dataServices, object connection) {
-            if (dataServices == null) {
+        void IProvider.Initialize(IDataServices dataServices, object connection)
+        {
+            if (dataServices == null)
+            {
                 throw Error.ArgumentNull("dataServices");
             }
             this.services = dataServices;
@@ -239,35 +285,42 @@ namespace System.Data.Linq.SqlClient {
             DbTransaction tx = null;
 
             string fileOrServerOrConnectionString = connection as string;
-            if (fileOrServerOrConnectionString != null) {
+            if (fileOrServerOrConnectionString != null)
+            {
                 string connectionString = this.GetConnectionString(fileOrServerOrConnectionString);
                 this.dbName = this.GetDatabaseName(connectionString);
                 con = new SqlConnection();
                 con.ConnectionString = connectionString;
             }
-            else {
+            else
+            {
                 // We only support SqlTransaction and SqlCeTransaction
                 tx = connection as SqlTransaction;
-                if (tx != null) {
+                if (tx != null)
+                {
                     connection = tx.Connection;
                 }
                 con = connection as DbConnection;
-                if (con == null) {
+                if (con == null)
+                {
                     throw Error.InvalidConnectionArgument("connection");
                 }
                 this.dbName = this.GetDatabaseName(con.ConnectionString);
             }
-            
+
             // initialize to the default command timeout
-            using (DbCommand c = con.CreateCommand()) {
+            using (DbCommand c = con.CreateCommand())
+            {
                 this.commandTimeout = c.CommandTimeout;
             }
 
             int maxUsersPerConnection = 1;
-            if (con.ConnectionString.IndexOf("MultipleActiveResultSets", StringComparison.OrdinalIgnoreCase) >= 0) {
+            if (con.ConnectionString.IndexOf("MultipleActiveResultSets", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
                 DbConnectionStringBuilder builder = new DbConnectionStringBuilder();
                 builder.ConnectionString = con.ConnectionString;
-                if (string.Compare((string)builder["MultipleActiveResultSets"], "true", StringComparison.OrdinalIgnoreCase) == 0) {
+                if (string.Compare((string)builder["MultipleActiveResultSets"], "true", StringComparison.OrdinalIgnoreCase) == 0)
+                {
                     maxUsersPerConnection = 50;
                 }
             }
@@ -284,11 +337,11 @@ namespace System.Data.Linq.SqlClient {
 #endif
 
             Type readerType;
-            if (con is SqlConnection) 
+            if (con is SqlConnection)
             {
                 readerType = typeof(SqlDataReader);
             }
-            else 
+            else
             {
                 readerType = typeof(DbDataReader);
             }
@@ -296,7 +349,8 @@ namespace System.Data.Linq.SqlClient {
         }
 
         #region Dispose\Finalize
-        public void Dispose() {            
+        public void Dispose()
+        {
             this.disposed = true;
             Dispose(true);
             // Technically, calling GC.SuppressFinalize is not required because the class does not
@@ -309,12 +363,15 @@ namespace System.Data.Linq.SqlClient {
         // to release. See http://msdnwiki.microsoft.com/en-us/mtpswiki/12afb1ea-3a17-4a3f-a1f0-fcdb853e2359.aspx
 
         // The bulk of the clean-up code is implemented in Dispose(bool)
-        protected virtual void Dispose(bool disposing) {
+        protected virtual void Dispose(bool disposing)
+        {
             // Implemented but empty so that derived contexts can implement
             // a finalizer that potentially cleans up unmanaged resources.
-            if (disposing) {
+            if (disposing)
+            {
                 this.services = null;
-                if (this.conManager != null) {
+                if (this.conManager != null)
+                {
                     this.conManager.DisposeConnection();
                 }
                 this.conManager = null;
@@ -326,20 +383,26 @@ namespace System.Data.Linq.SqlClient {
             }
         }
 
-        internal void CheckDispose() {
-            if (this.disposed) {
+        internal void CheckDispose()
+        {
+            if (this.disposed)
+            {
                 throw Error.ProviderCannotBeUsedAfterDispose();
             }
         }
         #endregion
 
-        private string GetConnectionString(string fileOrServerOrConnectionString) {
-            if (fileOrServerOrConnectionString.IndexOf('=') >= 0) {
+        private string GetConnectionString(string fileOrServerOrConnectionString)
+        {
+            if (fileOrServerOrConnectionString.IndexOf('=') >= 0)
+            {
                 return fileOrServerOrConnectionString;
             }
-            else {
+            else
+            {
                 DbConnectionStringBuilder builder = new DbConnectionStringBuilder();
-                if (fileOrServerOrConnectionString.EndsWith(".mdf", StringComparison.OrdinalIgnoreCase)) {
+                if (fileOrServerOrConnectionString.EndsWith(".mdf", StringComparison.OrdinalIgnoreCase))
+                {
                     // if just a database file is specified, default to local SqlExpress instance
                     builder.Add("AttachDBFileName", fileOrServerOrConnectionString);
                     builder.Add("Server", "localhost\\sqlexpress");
@@ -347,11 +410,13 @@ namespace System.Data.Linq.SqlClient {
                     builder.Add("User Instance", "true");
                     builder.Add("MultipleActiveResultSets", "true");
                 }
-                else if (fileOrServerOrConnectionString.EndsWith(".sdf", StringComparison.OrdinalIgnoreCase)) {
+                else if (fileOrServerOrConnectionString.EndsWith(".sdf", StringComparison.OrdinalIgnoreCase))
+                {
                     // A SqlCE database file has been specified
                     builder.Add("Data Source", fileOrServerOrConnectionString);
                 }
-                else {
+                else
+                {
                     builder.Add("Server", fileOrServerOrConnectionString);
                     builder.Add("Database", this.services.Model.DatabaseName);
                     builder.Add("Integrated Security", "SSPI");
@@ -360,24 +425,30 @@ namespace System.Data.Linq.SqlClient {
             }
         }
 
-        private string GetDatabaseName(string constr) {
+        private string GetDatabaseName(string constr)
+        {
             DbConnectionStringBuilder builder = new DbConnectionStringBuilder();
             builder.ConnectionString = constr;
 
-            if (builder.ContainsKey("Initial Catalog")) {
+            if (builder.ContainsKey("Initial Catalog"))
+            {
                 return (string)builder["Initial Catalog"];
             }
-            else if (builder.ContainsKey("Database")) {
+            else if (builder.ContainsKey("Database"))
+            {
                 return (string)builder["Database"];
             }
-            else if (builder.ContainsKey("AttachDBFileName")) {
+            else if (builder.ContainsKey("AttachDBFileName"))
+            {
                 return (string)builder["AttachDBFileName"];
             }
-            else if (builder.ContainsKey("Data Source") 
-                && ((string)builder["Data Source"]).EndsWith(".sdf", StringComparison.OrdinalIgnoreCase)) {
+            else if (builder.ContainsKey("Data Source")
+                && ((string)builder["Data Source"]).EndsWith(".sdf", StringComparison.OrdinalIgnoreCase))
+            {
                 return (string)builder["Data Source"];
             }
-            else {
+            else
+            {
                 return this.services.Model.DatabaseName;
             }
         }
@@ -385,7 +456,8 @@ namespace System.Data.Linq.SqlClient {
         [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
         [ResourceExposure(ResourceScope.None)] // Exposure is via other methods that set dbName.
         [ResourceConsumption(ResourceScope.Machine, ResourceScope.Machine)] // File.Exists method call.
-        void IProvider.CreateDatabase() {
+        void IProvider.CreateDatabase()
+        {
             this.CheckDispose();
             this.CheckInitialized();
             // Don't need to call CheckNotDeleted() here since we allow CreateDatabase after DeleteDatabase
@@ -396,44 +468,56 @@ namespace System.Data.Linq.SqlClient {
             DbConnectionStringBuilder builder = new DbConnectionStringBuilder();
             builder.ConnectionString = this.conManager.Connection.ConnectionString;
 
-            if (this.conManager.Connection.State == ConnectionState.Closed) {
+            if (this.conManager.Connection.State == ConnectionState.Closed)
+            {
                 // get connection string w/o reference to new catalog
                 object val;
-                if (builder.TryGetValue("Initial Catalog", out val)) {
+                if (builder.TryGetValue("Initial Catalog", out val))
+                {
                     catalog = val.ToString();
                     builder.Remove("Initial Catalog");
                 }
-                if (builder.TryGetValue("Database", out val)) {
+                if (builder.TryGetValue("Database", out val))
+                {
                     catalog = val.ToString();
                     builder.Remove("Database");
                 }
-                if (builder.TryGetValue("AttachDBFileName", out val)) {
+                if (builder.TryGetValue("AttachDBFileName", out val))
+                {
                     filename = val.ToString();
                     builder.Remove("AttachDBFileName");
                 }
                 this.conManager.Connection.ConnectionString = builder.ToString();
             }
-            else {
+            else
+            {
                 object val;
-                if (builder.TryGetValue("Initial Catalog", out val)) {
+                if (builder.TryGetValue("Initial Catalog", out val))
+                {
                     catalog = val.ToString();
                 }
-                if (builder.TryGetValue("Database", out val)) {
+                if (builder.TryGetValue("Database", out val))
+                {
                     catalog = val.ToString();
                 }
-                if (builder.TryGetValue("AttachDBFileName", out val)) {
+                if (builder.TryGetValue("AttachDBFileName", out val))
+                {
                     filename = val.ToString();
                 }
             }
 
-            if (String.IsNullOrEmpty(catalog)) {
-                if (!String.IsNullOrEmpty(filename)) {
+            if (String.IsNullOrEmpty(catalog))
+            {
+                if (!String.IsNullOrEmpty(filename))
+                {
                     catalog = Path.GetFullPath(filename);
-                } 
-                else if (!String.IsNullOrEmpty(this.dbName)) {
+                }
+                else if (!String.IsNullOrEmpty(this.dbName))
+                {
                     catalog = this.dbName;
-                } 
-                else {
+                }
+                else
+                {
                     throw Error.CouldNotDetermineCatalogName();
                 }
             }
@@ -441,8 +525,10 @@ namespace System.Data.Linq.SqlClient {
             this.conManager.UseConnection(this);
             this.conManager.AutoClose = false;
 
-            try {
-                if (this.services.Model.GetTables().FirstOrDefault() == null) {
+            try
+            {
+                if (this.services.Model.GetTables().FirstOrDefault() == null)
+                {
                     // we have no tables to create
                     throw Error.CreateDatabaseFailedBecauseOfContextWithNoTables(this.services.Model.DatabaseName);
                 }
@@ -456,17 +542,21 @@ namespace System.Data.Linq.SqlClient {
 
                 // create the schemas that our tables will need
                 // cannot be batched together with the rest of the CREATE TABLES
-                if (this.mode == ProviderMode.Sql2008) {
+                if (this.mode == ProviderMode.Sql2008)
+                {
                     HashSet<string> schemaCommands = new HashSet<string>();
 
-                    foreach (MetaTable table in this.services.Model.GetTables()) {
+                    foreach (MetaTable table in this.services.Model.GetTables())
+                    {
                         string schemaCommand = SqlBuilder.GetCreateSchemaForTableCommand(table);
-                        if (!string.IsNullOrEmpty(schemaCommand)) {
+                        if (!string.IsNullOrEmpty(schemaCommand))
+                        {
                             schemaCommands.Add(schemaCommand);
                         }
                     }
 
-                    foreach (string schemaCommand in schemaCommands) {
+                    foreach (string schemaCommand in schemaCommands)
+                    {
                         this.ExecuteCommand(schemaCommand);
                     }
                 }
@@ -474,31 +564,39 @@ namespace System.Data.Linq.SqlClient {
                 StringBuilder sb = new StringBuilder();
 
                 // create tables
-                foreach (MetaTable table in this.services.Model.GetTables()) {
+                foreach (MetaTable table in this.services.Model.GetTables())
+                {
                     string createTable = SqlBuilder.GetCreateTableCommand(table);
-                    if (!string.IsNullOrEmpty(createTable)) {
+                    if (!string.IsNullOrEmpty(createTable))
+                    {
                         sb.AppendLine(createTable);
                     }
                 }
 
                 // create all foreign keys after all tables are defined
-                foreach (MetaTable table in this.services.Model.GetTables()) {
-                    foreach (string createFK in SqlBuilder.GetCreateForeignKeyCommands(table)) {
-                        if (!string.IsNullOrEmpty(createFK)) {
+                foreach (MetaTable table in this.services.Model.GetTables())
+                {
+                    foreach (string createFK in SqlBuilder.GetCreateForeignKeyCommands(table))
+                    {
+                        if (!string.IsNullOrEmpty(createFK))
+                        {
                             sb.AppendLine(createFK);
                         }
                     }
                 }
 
-                if (sb.Length > 0) {
+                if (sb.Length > 0)
+                {
                     // must be on when creating indexes on computed columns
                     sb.Insert(0, "SET ARITHABORT ON" + Environment.NewLine);
                     this.ExecuteCommand(sb.ToString());
                 }
             }
-            finally {
+            finally
+            {
                 this.conManager.ReleaseConnection(this);
-                if (this.conManager.Connection is SqlConnection) {
+                if (this.conManager.Connection is SqlConnection)
+                {
                     SqlConnection.ClearAllPools();
                 }
             }
@@ -506,32 +604,39 @@ namespace System.Data.Linq.SqlClient {
 
         [ResourceExposure(ResourceScope.None)] // Exposure is via other methods that set dbName.
         [ResourceConsumption(ResourceScope.Machine, ResourceScope.Machine)] // File.Delete method call.
-        void IProvider.DeleteDatabase() {
+        void IProvider.DeleteDatabase()
+        {
             this.CheckDispose();
             this.CheckInitialized();
             // Don't need to call InitializeProviderMode() here since we don't need to know the provider to do this.
-            if (this.deleted) {
+            if (this.deleted)
+            {
                 // 2nd delete is no-op.
                 return;
             }
 
             string holdConnStr = conManager.Connection.ConnectionString;
             DbConnection con = this.conManager.UseConnection(this);
-            try {
+            try
+            {
                 con.ChangeDatabase("master");
-                if (con is SqlConnection) {
+                if (con is SqlConnection)
+                {
                     SqlConnection.ClearAllPools();
                 }
-                if (this.log != null) {
+                if (this.log != null)
+                {
                     this.log.WriteLine(Strings.LogAttemptingToDeleteDatabase(this.dbName));
                 }
                 this.ExecuteCommand(SqlBuilder.GetDropDatabaseCommand(this.dbName));
                 this.deleted = true;
             }
-            finally {
+            finally
+            {
                 this.conManager.ReleaseConnection(this);
                 if (conManager.Connection.State == ConnectionState.Closed &&
-                    string.Compare(conManager.Connection.ConnectionString, holdConnStr, StringComparison.Ordinal) != 0) {
+                    string.Compare(conManager.Connection.ConnectionString, holdConnStr, StringComparison.Ordinal) != 0)
+                {
                     // Credential information may have been stripped from the connection
                     // string as a result of opening the connection. Restore the full
                     // connection string.
@@ -540,20 +645,23 @@ namespace System.Data.Linq.SqlClient {
             }
         }
 
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification="[....]: Code needs to return false regarless of exception.")]
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "[....]: Code needs to return false regarless of exception.")]
         [ResourceExposure(ResourceScope.None)] // Exposure is via other methods that set dbName.
         [ResourceConsumption(ResourceScope.Machine, ResourceScope.Machine)] // File.Exists method call.
-        bool IProvider.DatabaseExists() {
+        bool IProvider.DatabaseExists()
+        {
             this.CheckDispose();
             this.CheckInitialized();
-            if (this.deleted) {
+            if (this.deleted)
+            {
                 return false;
             }
             // Don't need to call InitializeProviderMode() here since we don't need to know the provider to do this.
 
             bool exists = false;
             string holdConnStr = conManager.Connection.ConnectionString;
-            try {
+            try
+            {
                 // If no database name is explicitly specified on the connection,
                 // UseConnection will connect to 'Master', which is why after connecting
                 // we call ChangeDatabase to verify that the database actually exists.
@@ -561,10 +669,15 @@ namespace System.Data.Linq.SqlClient {
                 this.conManager.Connection.ChangeDatabase(this.dbName);
                 this.conManager.ReleaseConnection(this);
                 exists = true;
-            } catch (Exception) {
-            } finally {
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
                 if (conManager.Connection.State == ConnectionState.Closed &&
-                    string.Compare(conManager.Connection.ConnectionString, holdConnStr, StringComparison.Ordinal) != 0) {
+                    string.Compare(conManager.Connection.ConnectionString, holdConnStr, StringComparison.Ordinal) != 0)
+                {
                     // Credential information may have been stripped from the connection
                     // string as a result of opening the connection. Restore the full
                     // connection string.
@@ -574,17 +687,21 @@ namespace System.Data.Linq.SqlClient {
             return exists;
         }
 
-        void IConnectionUser.CompleteUse() {
+        void IConnectionUser.CompleteUse()
+        {
         }
 
-        void IProvider.ClearConnection() {
+        void IProvider.ClearConnection()
+        {
             this.CheckDispose();
             this.CheckInitialized();
             this.conManager.ClearConnection();
         }
 
-        private void ExecuteCommand(string command) {
-            if (this.log != null) {
+        private void ExecuteCommand(string command)
+        {
+            if (this.log != null)
+            {
                 this.log.WriteLine(command);
                 this.log.WriteLine();
             }
@@ -595,10 +712,12 @@ namespace System.Data.Linq.SqlClient {
             cmd.ExecuteNonQuery();
         }
 
-        ICompiledQuery IProvider.Compile(Expression query) {
+        ICompiledQuery IProvider.Compile(Expression query)
+        {
             this.CheckDispose();
             this.CheckInitialized();
-            if (query == null) {
+            if (query == null)
+            {
                 throw Error.ArgumentNull("query");
             }
             this.InitializeProviderMode();
@@ -606,20 +725,23 @@ namespace System.Data.Linq.SqlClient {
             SqlNodeAnnotations annotations = new SqlNodeAnnotations();
             QueryInfo[] qis = this.BuildQuery(query, annotations);
             CheckSqlCompatibility(qis, annotations);
-            
+
             LambdaExpression lambda = query as LambdaExpression;
-            if (lambda != null) {
+            if (lambda != null)
+            {
                 query = lambda.Body;
             }
 
             IObjectReaderFactory factory = null;
             ICompiledSubQuery[] subQueries = null;
             QueryInfo qi = qis[qis.Length - 1];
-            if (qi.ResultShape == ResultShape.Singleton) {
+            if (qi.ResultShape == ResultShape.Singleton)
+            {
                 subQueries = this.CompileSubQueries(qi.Query);
                 factory = this.GetReaderFactory(qi.Query, qi.ResultType);
             }
-            else if (qi.ResultShape == ResultShape.Sequence) {
+            else if (qi.ResultShape == ResultShape.Sequence)
+            {
                 subQueries = this.CompileSubQueries(qi.Query);
                 factory = this.GetReaderFactory(qi.Query, TypeSystem.GetElementType(qi.ResultType));
             }
@@ -627,7 +749,8 @@ namespace System.Data.Linq.SqlClient {
             return new CompiledQuery(this, query, qis, factory, subQueries);
         }
 
-        private ICompiledSubQuery CompileSubQuery(SqlNode query, Type elementType, ReadOnlyCollection<Me.SqlParameter> parameters) {
+        private ICompiledSubQuery CompileSubQuery(SqlNode query, Type elementType, ReadOnlyCollection<Me.SqlParameter> parameters)
+        {
             query = SqlDuplicator.Copy(query);
             SqlNodeAnnotations annotations = new SqlNodeAnnotations();
 
@@ -642,20 +765,24 @@ namespace System.Data.Linq.SqlClient {
             return new CompiledSubQuery(qi, factory, parameters, subQueries);
         }
 
-        IExecuteResult IProvider.Execute(Expression query) {
+        IExecuteResult IProvider.Execute(Expression query)
+        {
             this.CheckDispose();
             this.CheckInitialized();
             this.CheckNotDeleted();
-            if (query == null) {
+            if (query == null)
+            {
                 throw Error.ArgumentNull("query");
             }
             this.InitializeProviderMode();
 
             query = Funcletizer.Funcletize(query);
 
-            if (this.EnableCacheLookup) {
+            if (this.EnableCacheLookup)
+            {
                 IExecuteResult cached = this.GetCachedResult(query);
-                if (cached != null) {
+                if (cached != null)
+                {
                     return cached;
                 }
             }
@@ -665,18 +792,21 @@ namespace System.Data.Linq.SqlClient {
             CheckSqlCompatibility(qis, annotations);
 
             LambdaExpression lambda = query as LambdaExpression;
-            if (lambda != null) {
+            if (lambda != null)
+            {
                 query = lambda.Body;
             }
 
             IObjectReaderFactory factory = null;
             ICompiledSubQuery[] subQueries = null;
             QueryInfo qi = qis[qis.Length - 1];
-            if (qi.ResultShape == ResultShape.Singleton) {
+            if (qi.ResultShape == ResultShape.Singleton)
+            {
                 subQueries = this.CompileSubQueries(qi.Query);
                 factory = this.GetReaderFactory(qi.Query, qi.ResultType);
             }
-            else if (qi.ResultShape == ResultShape.Sequence) {
+            else if (qi.ResultShape == ResultShape.Sequence)
+            {
                 subQueries = this.CompileSubQueries(qi.Query);
                 factory = this.GetReaderFactory(qi.Query, TypeSystem.GetElementType(qi.ResultType));
             }
@@ -686,34 +816,41 @@ namespace System.Data.Linq.SqlClient {
             return result;
         }
 
-        private ICompiledSubQuery[] CompileSubQueries(SqlNode query) {
-            return new SubQueryCompiler(this).Compile(query);            
+        private ICompiledSubQuery[] CompileSubQueries(SqlNode query)
+        {
+            return new SubQueryCompiler(this).Compile(query);
         }
 
-        class SubQueryCompiler : SqlVisitor {
+        class SubQueryCompiler : SqlVisitor
+        {
             SqlProvider provider;
             List<ICompiledSubQuery> subQueries;
 
-            internal SubQueryCompiler(SqlProvider provider) {
+            internal SubQueryCompiler(SqlProvider provider)
+            {
                 this.provider = provider;
             }
 
-            internal ICompiledSubQuery[] Compile(SqlNode node) {
+            internal ICompiledSubQuery[] Compile(SqlNode node)
+            {
                 this.subQueries = new List<ICompiledSubQuery>();
                 this.Visit(node);
                 return this.subQueries.ToArray();
             }
 
-            internal override SqlSelect VisitSelect(SqlSelect select) {
+            internal override SqlSelect VisitSelect(SqlSelect select)
+            {
                 this.Visit(select.Selection);
                 return select;
             }
 
-            internal override SqlExpression VisitSubSelect(SqlSubSelect ss) {
+            internal override SqlExpression VisitSubSelect(SqlSubSelect ss)
+            {
                 return ss;
             }
 
-            internal override SqlExpression VisitClientQuery(SqlClientQuery cq) {
+            internal override SqlExpression VisitClientQuery(SqlClientQuery cq)
+            {
                 Type clientElementType = cq.Query.NodeType == SqlNodeType.Multiset ? TypeSystem.GetElementType(cq.ClrType) : cq.ClrType;
                 ICompiledSubQuery c = this.provider.CompileSubQuery(cq.Query.Select, clientElementType, cq.Parameters.AsReadOnly());
                 cq.Ordinal = this.subQueries.Count;
@@ -726,7 +863,8 @@ namespace System.Data.Linq.SqlClient {
         /// Look for compatibility annotations for the set of providers we
         /// add annotations for.
         /// </summary>
-        private void CheckSqlCompatibility(QueryInfo[] queries, SqlNodeAnnotations annotations) {
+        private void CheckSqlCompatibility(QueryInfo[] queries, SqlNodeAnnotations annotations)
+        {
             //if (this.Mode == ProviderMode.Sql2000) {
             //    for (int i = 0, n = queries.Length; i < n; i++) {
             //        SqlServerCompatibilityCheck.ThrowIfUnsupported(queries[i].Query, annotations, this.Mode);
@@ -734,17 +872,22 @@ namespace System.Data.Linq.SqlClient {
             //}
         }
 
-        private IExecuteResult ExecuteAll(Expression query, QueryInfo[] queryInfos, IObjectReaderFactory factory, object[] userArguments, ICompiledSubQuery[] subQueries) {
+        private IExecuteResult ExecuteAll(Expression query, QueryInfo[] queryInfos, IObjectReaderFactory factory, object[] userArguments, ICompiledSubQuery[] subQueries)
+        {
             IExecuteResult result = null;
             object lastResult = null;
-            for (int i = 0, n = queryInfos.Length; i < n; i++) {
-                if (i < n - 1) {
+            for (int i = 0, n = queryInfos.Length; i < n; i++)
+            {
+                if (i < n - 1)
+                {
                     result = this.Execute(query, queryInfos[i], null, null, userArguments, subQueries, lastResult);
                 }
-                else {
+                else
+                {
                     result = this.Execute(query, queryInfos[i], factory, null, userArguments, subQueries, lastResult);
                 }
-                if (queryInfos[i].ResultShape == ResultShape.Return) {
+                if (queryInfos[i].ResultShape == ResultShape.Return)
+                {
                     lastResult = result.ReturnValue;
                 }
             }
@@ -752,10 +895,13 @@ namespace System.Data.Linq.SqlClient {
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        private IExecuteResult GetCachedResult(Expression query) {
+        private IExecuteResult GetCachedResult(Expression query)
+        {
             object obj = this.services.GetCachedObject(query);
-            if (obj != null) {
-                switch (this.GetResultShape(query)) {
+            if (obj != null)
+            {
+                switch (this.GetResultShape(query))
+                {
                     case ResultShape.Singleton:
                         return new ExecuteResult(null, null, null, obj);
                     case ResultShape.Sequence:
@@ -769,14 +915,16 @@ namespace System.Data.Linq.SqlClient {
             return null;
         }
 
-        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification="Unknown reason.")]
+        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Unknown reason.")]
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        private IExecuteResult Execute(Expression query, QueryInfo queryInfo, IObjectReaderFactory factory, object[] parentArgs, object[] userArgs, ICompiledSubQuery[] subQueries, object lastResult) {
+        private IExecuteResult Execute(Expression query, QueryInfo queryInfo, IObjectReaderFactory factory, object[] parentArgs, object[] userArgs, ICompiledSubQuery[] subQueries, object lastResult)
+        {
             this.InitializeProviderMode();
 
             DbConnection con = this.conManager.UseConnection(this);
             DbCommand cmd = null;
-            try {
+            try
+            {
                 cmd = con.CreateCommand();
                 cmd.CommandText = queryInfo.CommandText;
                 cmd.Transaction = this.conManager.Transaction;
@@ -785,16 +933,20 @@ namespace System.Data.Linq.SqlClient {
                 LogCommand(this.log, cmd);
                 this.queryCount += 1;
 
-                switch (queryInfo.ResultShape) {
+                switch (queryInfo.ResultShape)
+                {
                     default:
-                    case ResultShape.Return: {
+                    case ResultShape.Return:
+                        {
                             return new ExecuteResult(cmd, queryInfo.Parameters, null, cmd.ExecuteNonQuery(), true);
                         }
-                    case ResultShape.Singleton: {
-                            DbDataReader reader = cmd.ExecuteReader();                            
-                            IObjectReader objReader = factory.Create(reader, true, this, parentArgs, userArgs, subQueries);                        
+                    case ResultShape.Singleton:
+                        {
+                            DbDataReader reader = cmd.ExecuteReader();
+                            IObjectReader objReader = factory.Create(reader, true, this, parentArgs, userArgs, subQueries);
                             this.conManager.UseConnection(objReader.Session);
-                            try {
+                            try
+                            {
                                 IEnumerable sequence = (IEnumerable)Activator.CreateInstance(
                                     typeof(OneTimeEnumerable<>).MakeGenericType(queryInfo.ResultType),
                                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null,
@@ -806,8 +958,10 @@ namespace System.Data.Linq.SqlClient {
                                 if (mce != null && (
                                     mce.Method.DeclaringType == typeof(Queryable) ||
                                     mce.Method.DeclaringType == typeof(Enumerable))
-                                    ) {
-                                    switch (mce.Method.Name) {
+                                    )
+                                {
+                                    switch (mce.Method.Name)
+                                    {
                                         case "First":
                                         case "FirstOrDefault":
                                         case "SingleOrDefault":
@@ -819,18 +973,23 @@ namespace System.Data.Linq.SqlClient {
                                             break;
                                     }
                                 }
-                                else {
+                                else
+                                {
                                     sequenceMethod = TypeSystem.FindSequenceMethod("SingleOrDefault", sequence);
                                 }
 
                                 // When dynamically invoking the sequence method, we want to
                                 // return the inner exception if the invocation fails
-                                if (sequenceMethod != null) {
-                                    try {
+                                if (sequenceMethod != null)
+                                {
+                                    try
+                                    {
                                         value = sequenceMethod.Invoke(null, new object[] { sequence });
                                     }
-                                    catch (TargetInvocationException tie) {
-                                        if (tie.InnerException != null) {
+                                    catch (TargetInvocationException tie)
+                                    {
+                                        if (tie.InnerException != null)
+                                        {
                                             throw tie.InnerException;
                                         }
                                         throw;
@@ -839,11 +998,13 @@ namespace System.Data.Linq.SqlClient {
 
                                 return new ExecuteResult(cmd, queryInfo.Parameters, objReader.Session, value);
                             }
-                            finally {
+                            finally
+                            {
                                 objReader.Dispose();
                             }
                         }
-                    case ResultShape.Sequence: {
+                    case ResultShape.Sequence:
+                        {
                             DbDataReader reader = cmd.ExecuteReader();
                             IObjectReader objReader = factory.Create(reader, true, this, parentArgs, userArgs, subQueries);
                             this.conManager.UseConnection(objReader.Session);
@@ -852,12 +1013,14 @@ namespace System.Data.Linq.SqlClient {
                                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null,
                                 new object[] { objReader }, null
                                 );
-                            if (typeof(IQueryable).IsAssignableFrom(queryInfo.ResultType)) {
+                            if (typeof(IQueryable).IsAssignableFrom(queryInfo.ResultType))
+                            {
                                 sequence = sequence.AsQueryable();
                             }
                             ExecuteResult result = new ExecuteResult(cmd, queryInfo.Parameters, objReader.Session);
                             MetaFunction function = this.GetFunction(query);
-                            if (function != null && !function.IsComposable) {
+                            if (function != null && !function.IsComposable)
+                            {
                                 sequence = (IEnumerable)Activator.CreateInstance(
                                 typeof(SingleResult<>).MakeGenericType(TypeSystem.GetElementType(queryInfo.ResultType)),
                                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null,
@@ -867,7 +1030,8 @@ namespace System.Data.Linq.SqlClient {
                             result.ReturnValue = sequence;
                             return result;
                         }
-                    case ResultShape.MultipleResults: {
+                    case ResultShape.MultipleResults:
+                        {
                             DbDataReader reader = cmd.ExecuteReader();
                             IObjectReaderSession session = this.readerCompiler.CreateSession(reader, this, parentArgs, userArgs, subQueries);
                             this.conManager.UseConnection(session);
@@ -890,7 +1054,8 @@ namespace System.Data.Linq.SqlClient {
 
                 throw;
             }
-            finally {
+            finally
+            {
                 this.conManager.ReleaseConnection(this);
             }
         }
@@ -920,40 +1085,48 @@ namespace System.Data.Linq.SqlClient {
             }
         }
 
-        private MetaFunction GetFunction(Expression query) {
+        private MetaFunction GetFunction(Expression query)
+        {
             LambdaExpression lambda = query as LambdaExpression;
-            if (lambda != null) {
+            if (lambda != null)
+            {
                 query = lambda.Body;
             }
             MethodCallExpression mc = query as MethodCallExpression;
-            if (mc != null) {
+            if (mc != null)
+            {
                 return this.services.Model.GetFunction(mc.Method);
             }
             return null;
         }
 
-        private void LogCommand(TextWriter writer, DbCommand cmd) {
-            if (writer != null) {
+        private void LogCommand(TextWriter writer, DbCommand cmd)
+        {
+            if (writer != null)
+            {
                 writer.WriteLine(cmd.CommandText);
-                foreach (DbParameter p in cmd.Parameters) {
+                foreach (DbParameter p in cmd.Parameters)
+                {
                     int prec = 0;
                     int scale = 0;
                     PropertyInfo piPrecision = p.GetType().GetProperty("Precision");
-                    if (piPrecision != null) {
+                    if (piPrecision != null)
+                    {
                         prec = (int)Convert.ChangeType(piPrecision.GetValue(p, null), typeof(int), CultureInfo.InvariantCulture);
                     }
                     PropertyInfo piScale = p.GetType().GetProperty("Scale");
-                    if (piScale != null) {
+                    if (piScale != null)
+                    {
                         scale = (int)Convert.ChangeType(piScale.GetValue(p, null), typeof(int), CultureInfo.InvariantCulture);
-                    }                
+                    }
                     var sp = p as System.Data.SqlClient.SqlParameter;
-                    writer.WriteLine("-- {0}: {1} {2} (Size = {3}; Prec = {4}; Scale = {5}) [{6}]", 
-                        p.ParameterName, 
-                        p.Direction, 
+                    writer.WriteLine("-- {0}: {1} {2} (Size = {3}; Prec = {4}; Scale = {5}) [{6}]",
+                        p.ParameterName,
+                        p.Direction,
                         sp == null ? p.DbType.ToString() : sp.SqlDbType.ToString(),
-                        p.Size.ToString(System.Globalization.CultureInfo.CurrentCulture), 
-                        prec, 
-                        scale, 
+                        p.Size.ToString(System.Globalization.CultureInfo.CurrentCulture),
+                        prec,
+                        scale,
                         sp == null ? p.Value : sp.SqlValue);
                 }
                 writer.WriteLine("-- Context: {0}({1}) Model: {2} Build: {3}", this.GetType().Name, this.Mode, this.services.Model.GetType().Name, ThisAssembly.InformationalVersion);
@@ -961,20 +1134,28 @@ namespace System.Data.Linq.SqlClient {
             }
         }
 
-        private void AssignParameters(DbCommand cmd, ReadOnlyCollection<SqlParameterInfo> parms, object[] userArguments, object lastResult) {
-            if (parms != null) {
-                foreach (SqlParameterInfo pi in parms) {
+        private void AssignParameters(DbCommand cmd, ReadOnlyCollection<SqlParameterInfo> parms, object[] userArguments, object lastResult)
+        {
+            if (parms != null)
+            {
+                foreach (SqlParameterInfo pi in parms)
+                {
                     DbParameter p = cmd.CreateParameter();
                     p.ParameterName = pi.Parameter.Name;
                     p.Direction = pi.Parameter.Direction;
                     if (pi.Parameter.Direction == ParameterDirection.Input ||
-                        pi.Parameter.Direction == ParameterDirection.InputOutput) {
+                        pi.Parameter.Direction == ParameterDirection.InputOutput)
+                    {
                         object value = pi.Value;
-                        switch (pi.Type) {
+                        switch (pi.Type)
+                        {
                             case SqlParameterType.UserArgument:
-                                try {
+                                try
+                                {
                                     value = pi.Accessor.DynamicInvoke(new object[] { userArguments });
-                                } catch (System.Reflection.TargetInvocationException e) {
+                                }
+                                catch (System.Reflection.TargetInvocationException e)
+                                {
                                     throw e.InnerException;
                                 }
                                 break;
@@ -984,7 +1165,8 @@ namespace System.Data.Linq.SqlClient {
                         }
                         this.typeProvider.InitializeParameter(pi.Parameter.SqlType, p, value);
                     }
-                    else {
+                    else
+                    {
                         this.typeProvider.InitializeParameter(pi.Parameter.SqlType, p, null);
                     }
                     cmd.Parameters.Add(p);
@@ -993,14 +1175,17 @@ namespace System.Data.Linq.SqlClient {
         }
 
         [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.NoOptimization)]
-        IEnumerable IProvider.Translate(Type elementType, DbDataReader reader) {
+        IEnumerable IProvider.Translate(Type elementType, DbDataReader reader)
+        {
             this.CheckDispose();
             this.CheckInitialized();
             this.InitializeProviderMode();
-            if (elementType == null) {
+            if (elementType == null)
+            {
                 throw Error.ArgumentNull("elementType");
             }
-            if (reader == null) {
+            if (reader == null)
+            {
                 throw Error.ArgumentNull("reader");
             }
             MetaType rowType = services.Model.GetMetaType(elementType);
@@ -1010,21 +1195,25 @@ namespace System.Data.Linq.SqlClient {
             return (IEnumerable)Activator.CreateInstance(enumerableType, BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { e }, null);
         }
 
-        IMultipleResults IProvider.Translate(DbDataReader reader) {
+        IMultipleResults IProvider.Translate(DbDataReader reader)
+        {
             this.CheckDispose();
             this.CheckInitialized();
             this.InitializeProviderMode();
-            if (reader == null) {
+            if (reader == null)
+            {
                 throw Error.ArgumentNull("reader");
             }
             IObjectReaderSession session = this.readerCompiler.CreateSession(reader, this, null, null, null);
             return new MultipleResults(this, null, session, null);
         }
 
-         string IProvider.GetQueryText(Expression query) {
+        string IProvider.GetQueryText(Expression query)
+        {
             this.CheckDispose();
             this.CheckInitialized();
-            if (query == null) {
+            if (query == null)
+            {
                 throw Error.ArgumentNull("query");
             }
             this.InitializeProviderMode();
@@ -1032,7 +1221,8 @@ namespace System.Data.Linq.SqlClient {
             QueryInfo[] qis = this.BuildQuery(query, annotations);
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 0, n = qis.Length; i < n; i++) {
+            for (int i = 0, n = qis.Length; i < n; i++)
+            {
                 QueryInfo qi = qis[i];
 #if DEBUG
                 StringWriter writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture);
@@ -1049,10 +1239,12 @@ namespace System.Data.Linq.SqlClient {
             return sb.ToString();
         }
 
-        DbCommand IProvider.GetCommand(Expression query) {
+        DbCommand IProvider.GetCommand(Expression query)
+        {
             this.CheckDispose();
             this.CheckInitialized();
-            if (query == null) {
+            if (query == null)
+            {
                 throw Error.ArgumentNull("query");
             }
             this.InitializeProviderMode();
@@ -1067,54 +1259,66 @@ namespace System.Data.Linq.SqlClient {
             return cmd;
         }
 
-        internal class QueryInfo {
+        internal class QueryInfo
+        {
             SqlNode query;
             string commandText;
             ReadOnlyCollection<SqlParameterInfo> parameters;
             ResultShape resultShape;
             Type resultType;
 
-            internal QueryInfo(SqlNode query, string commandText, ReadOnlyCollection<SqlParameterInfo> parameters, ResultShape resultShape, Type resultType) {
+            internal QueryInfo(SqlNode query, string commandText, ReadOnlyCollection<SqlParameterInfo> parameters, ResultShape resultShape, Type resultType)
+            {
                 this.query = query;
                 this.commandText = commandText;
                 this.parameters = parameters;
                 this.resultShape = resultShape;
                 this.resultType = resultType;
             }
-            internal SqlNode Query {
+            internal SqlNode Query
+            {
                 get { return this.query; }
             }
-            internal string CommandText {
+            internal string CommandText
+            {
                 get { return this.commandText; }
             }
-            internal ReadOnlyCollection<SqlParameterInfo> Parameters {
+            internal ReadOnlyCollection<SqlParameterInfo> Parameters
+            {
                 get { return this.parameters; }
             }
-            internal ResultShape ResultShape {
+            internal ResultShape ResultShape
+            {
                 get { return this.resultShape; }
             }
-            internal Type ResultType {
+            internal Type ResultType
+            {
                 get { return this.resultType; }
             }
         }
 
-        internal enum ResultShape {
+        internal enum ResultShape
+        {
             Return,
             Singleton,
             Sequence,
             MultipleResults
         }
 
-        private ResultShape GetResultShape(Expression query) {
+        private ResultShape GetResultShape(Expression query)
+        {
             LambdaExpression lambda = query as LambdaExpression;
-            if (lambda != null) {
+            if (lambda != null)
+            {
                 query = lambda.Body;
             }
 
-            if (query.Type == typeof(void)) {
+            if (query.Type == typeof(void))
+            {
                 return ResultShape.Return;
             }
-            else if (query.Type == typeof(IMultipleResults)) {
+            else if (query.Type == typeof(IMultipleResults))
+            {
                 return ResultShape.MultipleResults;
             }
 
@@ -1124,11 +1328,14 @@ namespace System.Data.Linq.SqlClient {
             bool isSingleton = isScalar || !isSequence;
 
             MethodCallExpression mce = query as MethodCallExpression;
-            if (mce != null) {
+            if (mce != null)
+            {
                 // query operators
                 if (mce.Method.DeclaringType == typeof(Queryable) ||
-                    mce.Method.DeclaringType == typeof(Enumerable)) {
-                    switch (mce.Method.Name) {
+                    mce.Method.DeclaringType == typeof(Enumerable))
+                {
+                    switch (mce.Method.Name)
+                    {
                         // methods known to produce singletons
                         case "First":
                         case "FirstOrDefault":
@@ -1138,48 +1345,61 @@ namespace System.Data.Linq.SqlClient {
                             break;
                     }
                 }
-                else if (mce.Method.DeclaringType == typeof(DataContext)) {
-                    if (mce.Method.Name == "ExecuteCommand") {
+                else if (mce.Method.DeclaringType == typeof(DataContext))
+                {
+                    if (mce.Method.Name == "ExecuteCommand")
+                    {
                         return ResultShape.Return;
                     }
                 }
-                else if (mce.Method.DeclaringType.IsSubclassOf(typeof(DataContext))) {
+                else if (mce.Method.DeclaringType.IsSubclassOf(typeof(DataContext)))
+                {
                     MetaFunction f = this.GetFunction(query);
-                    if (f != null) {
-                        if (!f.IsComposable) {
+                    if (f != null)
+                    {
+                        if (!f.IsComposable)
+                        {
                             isSingleton = false;
                         }
-                        else if (isScalar) {
+                        else if (isScalar)
+                        {
                             isSingleton = true;
                         }
                     }
                 }
-                else if (mce.Method.DeclaringType == typeof(DataManipulation) && mce.Method.ReturnType == typeof(int)) {
+                else if (mce.Method.DeclaringType == typeof(DataManipulation) && mce.Method.ReturnType == typeof(int))
+                {
                     return ResultShape.Return;
                 }
             }
 
-            if (isSingleton) {
+            if (isSingleton)
+            {
                 return ResultShape.Singleton;
             }
-            else if (isScalar) {
+            else if (isScalar)
+            {
                 return ResultShape.Return;
             }
-            else {
+            else
+            {
                 return ResultShape.Sequence;
             }
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification="Unknown reason.")]
-        private Type GetResultType(Expression query) {
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Unknown reason.")]
+        private Type GetResultType(Expression query)
+        {
             LambdaExpression lambda = query as LambdaExpression;
-            if (lambda != null) {
+            if (lambda != null)
+            {
                 query = lambda.Body;
             }
             return query.Type;
         }
 
-        internal QueryInfo[] BuildQuery(Expression query, SqlNodeAnnotations annotations) {
+        internal QueryInfo[] BuildQuery(Expression query, SqlNodeAnnotations annotations)
+        {
             this.CheckDispose();
 
             // apply maximal funcletization
@@ -1187,7 +1407,8 @@ namespace System.Data.Linq.SqlClient {
 
             // convert query nodes into sql nodes
             QueryConverter converter = new QueryConverter(this.services, this.typeProvider, this.translator, this.sqlFactory);
-            switch (this.Mode) {
+            switch (this.Mode)
+            {
                 case ProviderMode.Sql2008:
                     converter.ConverterStrategy =
                         ConverterStrategy.CanUseScopeIdentity |
@@ -1203,15 +1424,17 @@ namespace System.Data.Linq.SqlClient {
             return this.BuildQuery(this.GetResultShape(query), this.GetResultType(query), node, null, annotations);
         }
 
-        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification="These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
-        private QueryInfo[] BuildQuery(ResultShape resultShape, Type resultType, SqlNode node, ReadOnlyCollection<Me.SqlParameter> parentParameters, SqlNodeAnnotations annotations) {
+        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "These issues are related to our use of if-then and case statements for node types, which adds to the complexity count however when reviewed they are easy to navigate and understand.")]
+        private QueryInfo[] BuildQuery(ResultShape resultShape, Type resultType, SqlNode node, ReadOnlyCollection<Me.SqlParameter> parentParameters, SqlNodeAnnotations annotations)
+        {
             System.Diagnostics.Debug.Assert(resultType != null);
             System.Diagnostics.Debug.Assert(node != null);
 
             SqlSupersetValidator validator = new SqlSupersetValidator();
 
             // These are the rules that apply to every SQL tree.
-            if (this.checkQueries) {
+            if (this.checkQueries)
+            {
                 validator.AddValidator(new ColumnTypeValidator()); /* Column CLR Type must agree with its Expressions CLR Type */
                 validator.AddValidator(new LiteralValidator()); /* Constrain literal Types */
             }
@@ -1225,12 +1448,14 @@ namespace System.Data.Linq.SqlClient {
             SqlBinder binder = new SqlBinder(this.translator, this.sqlFactory, this.services.Model, this.services.Context.LoadOptions, columnizer, canUseOuterApply);
             binder.OptimizeLinkExpansions = (optimizationFlags & OptimizationFlags.OptimizeLinkExpansions) != 0;
             binder.SimplifyCaseStatements = (optimizationFlags & OptimizationFlags.SimplifyCaseStatements) != 0;
-            binder.PreBinder = delegate(SqlNode n) {
+            binder.PreBinder = delegate (SqlNode n)
+            {
                 // convert methods into known reversable operators
                 return PreBindDotNetConverter.Convert(n, this.sqlFactory, this.services.Model);
             };
             node = binder.Bind(node);
-            if (this.checkQueries) {
+            if (this.checkQueries)
+            {
                 validator.AddValidator(new ExpectNoAliasRefs());
                 validator.AddValidator(new ExpectNoSharedExpressions());
             }
@@ -1254,7 +1479,7 @@ namespace System.Data.Linq.SqlClient {
             validator.Validate(node);
 
             // convert multisets into separate queries
-            SqlMultiplexer.Options options = (this.Mode == ProviderMode.Sql2008) 
+            SqlMultiplexer.Options options = (this.Mode == ProviderMode.Sql2008)
                 ? SqlMultiplexer.Options.EnableBigJoin : SqlMultiplexer.Options.None;
             SqlMultiplexer mux = new SqlMultiplexer(options, parentParameters, this.sqlFactory);
             node = mux.Multiplex(node);
@@ -1282,12 +1507,14 @@ namespace System.Data.Linq.SqlClient {
 
             // Inject code to turn predicates into bits, and bits into predicates where necessary
             node = SqlBooleanizer.Rationalize(node, this.typeProvider, this.services.Model);
-            if (this.checkQueries) {
+            if (this.checkQueries)
+            {
                 validator.AddValidator(new ExpectRationalizedBooleans()); /* From now on all boolean expressions should remain rationalized. */
             }
             validator.Validate(node);
 
-            if (this.checkQueries) {
+            if (this.checkQueries)
+            {
                 validator.AddValidator(new ExpectNoFloatingColumns());
             }
 
@@ -1342,7 +1569,7 @@ namespace System.Data.Linq.SqlClient {
             // These new types do not exist on SQL2k, so add annotations.
             LongTypeConverter longTypeConverter = new LongTypeConverter(this.sqlFactory);
             node = longTypeConverter.AddConversions(node, annotations);
-   
+
             // final validation            
             validator.AddValidator(new ExpectNoMethodCalls());
             validator.AddValidator(new ValidateNoInvalidComparison());
@@ -1350,7 +1577,8 @@ namespace System.Data.Linq.SqlClient {
 
             SqlParameterizer parameterizer = new SqlParameterizer(this.typeProvider, annotations);
             SqlFormatter formatter = new SqlFormatter(((IProvider)this).StatementLabel);
-            if (this.mode == ProviderMode.Sql2008) {
+            if (this.mode == ProviderMode.Sql2008)
+            {
                 formatter.ParenthesizeTop = true;
             }
 
@@ -1361,11 +1589,14 @@ namespace System.Data.Linq.SqlClient {
                 };
         }
 
-        private SqlSelect GetFinalSelect(SqlNode node) {
-            switch (node.NodeType) {
+        private SqlSelect GetFinalSelect(SqlNode node)
+        {
+            switch (node.NodeType)
+            {
                 case SqlNodeType.Select:
                     return (SqlSelect)node;
-                case SqlNodeType.Block: {
+                case SqlNodeType.Block:
+                    {
                         SqlBlock b = (SqlBlock)node;
                         return GetFinalSelect(b.Statements[b.Statements.Count - 1]);
                     }
@@ -1373,46 +1604,57 @@ namespace System.Data.Linq.SqlClient {
             return null;
         }
 
-        private IObjectReaderFactory GetReaderFactory(SqlNode node, Type elemType) {
+        private IObjectReaderFactory GetReaderFactory(SqlNode node, Type elemType)
+        {
             SqlSelect sel = node as SqlSelect;
             SqlExpression projection = null;
-            if (sel == null && node.NodeType == SqlNodeType.Block) {
+            if (sel == null && node.NodeType == SqlNodeType.Block)
+            {
                 sel = this.GetFinalSelect(node);
             }
-            if (sel != null) {
+            if (sel != null)
+            {
                 projection = sel.Selection;
             }
-            else {
+            else
+            {
                 SqlUserQuery suq = node as SqlUserQuery;
-                if (suq != null && suq.Projection != null) {
+                if (suq != null && suq.Projection != null)
+                {
                     projection = suq.Projection;
                 }
             }
             IObjectReaderFactory factory;
-            if (projection != null) {
+            if (projection != null)
+            {
                 factory = this.readerCompiler.Compile(projection, elemType);
             }
-            else {
+            else
+            {
                 return this.GetDefaultFactory(services.Model.GetMetaType(elemType));
             }
             return factory;
         }
 
-        private IObjectReaderFactory GetDefaultFactory(MetaType rowType) {
-            if (rowType == null) {
+        private IObjectReaderFactory GetDefaultFactory(MetaType rowType)
+        {
+            if (rowType == null)
+            {
                 throw Error.ArgumentNull("rowType");
             }
             SqlNodeAnnotations annotations = new SqlNodeAnnotations();
             Expression tmp = Expression.Constant(null);
             SqlUserQuery suq = new SqlUserQuery(string.Empty, null, null, tmp);
-            if (TypeSystem.IsSimpleType(rowType.Type)) {
+            if (TypeSystem.IsSimpleType(rowType.Type))
+            {
                 // if the element type is a simple type (int, bool, etc.) we create
                 // a single column binding
                 SqlUserColumn col = new SqlUserColumn(rowType.Type, typeProvider.From(rowType.Type), suq, "", false, suq.SourceExpression);
                 suq.Columns.Add(col);
                 suq.Projection = col;
             }
-            else {
+            else
+            {
                 // ... otherwise we generate a default projection
                 SqlUserRow rowExp = new SqlUserRow(rowType.InheritanceRoot, this.typeProvider.GetApplicationType((int)ConverterSpecialTypes.Row), suq, tmp);
                 suq.Projection = this.translator.BuildProjection(rowExp, rowType, true, null, tmp);
@@ -1422,14 +1664,16 @@ namespace System.Data.Linq.SqlClient {
             return this.GetReaderFactory(qis[qis.Length - 1].Query, rowType.Type);
         }
 
-        class CompiledQuery : ICompiledQuery {
+        class CompiledQuery : ICompiledQuery
+        {
             DataLoadOptions originalShape;
             Expression query;
             QueryInfo[] queryInfos;
             IObjectReaderFactory factory;
             ICompiledSubQuery[] subQueries;
 
-            internal CompiledQuery(SqlProvider provider, Expression query, QueryInfo[] queryInfos, IObjectReaderFactory factory, ICompiledSubQuery[] subQueries) {
+            internal CompiledQuery(SqlProvider provider, Expression query, QueryInfo[] queryInfos, IObjectReaderFactory factory, ICompiledSubQuery[] subQueries)
+            {
                 this.originalShape = provider.services.Context.LoadOptions;
                 this.query = query;
                 this.queryInfos = queryInfos;
@@ -1437,18 +1681,22 @@ namespace System.Data.Linq.SqlClient {
                 this.subQueries = subQueries;
             }
 
-            public IExecuteResult Execute(IProvider provider, object[] arguments) {
-                if (provider == null) {
+            public IExecuteResult Execute(IProvider provider, object[] arguments)
+            {
+                if (provider == null)
+                {
                     throw Error.ArgumentNull("provider");
                 }
 
                 SqlProvider sqlProvider = provider as SqlProvider;
-                if (sqlProvider == null) {
+                if (sqlProvider == null)
+                {
                     throw Error.ArgumentTypeMismatch("provider");
                 }
 
                 // verify shape is compatibile with original.
-                if (!AreEquivalentShapes(this.originalShape, sqlProvider.services.Context.LoadOptions)) {
+                if (!AreEquivalentShapes(this.originalShape, sqlProvider.services.Context.LoadOptions))
+                {
                     throw Error.CompiledQueryAgainstMultipleShapesNotSupported();
                 }
 
@@ -1456,43 +1704,53 @@ namespace System.Data.Linq.SqlClient {
                 return sqlProvider.ExecuteAll(this.query, this.queryInfos, this.factory, arguments, subQueries);
             }
 
-            private static bool AreEquivalentShapes(DataLoadOptions shape1, DataLoadOptions shape2) {
-                if (object.Equals(shape1, shape2)) {
+            private static bool AreEquivalentShapes(DataLoadOptions shape1, DataLoadOptions shape2)
+            {
+                if (object.Equals(shape1, shape2))
+                {
                     return true;
                 }
-                else if (shape1 == null) {
+                else if (shape1 == null)
+                {
                     return shape2.IsEmpty;
                 }
-                else if (shape2 == null) {
+                else if (shape2 == null)
+                {
                     return shape1.IsEmpty;
                 }
-                else if (shape1.IsEmpty && shape2.IsEmpty) {
+                else if (shape1.IsEmpty && shape2.IsEmpty)
+                {
                     return true;
                 }
                 return false;
             }
         }
 
-        class CompiledSubQuery : ICompiledSubQuery {
+        class CompiledSubQuery : ICompiledSubQuery
+        {
             QueryInfo queryInfo;
             IObjectReaderFactory factory;
             ReadOnlyCollection<Me.SqlParameter> parameters;
             ICompiledSubQuery[] subQueries;
 
-            internal CompiledSubQuery(QueryInfo queryInfo, IObjectReaderFactory factory, ReadOnlyCollection<Me.SqlParameter> parameters, ICompiledSubQuery[] subQueries) {
+            internal CompiledSubQuery(QueryInfo queryInfo, IObjectReaderFactory factory, ReadOnlyCollection<Me.SqlParameter> parameters, ICompiledSubQuery[] subQueries)
+            {
                 this.queryInfo = queryInfo;
                 this.factory = factory;
                 this.parameters = parameters;
                 this.subQueries = subQueries;
             }
 
-            public IExecuteResult Execute(IProvider provider, object[] parentArgs, object[] userArgs) {
-                if (parentArgs == null && !(this.parameters == null || this.parameters.Count == 0)) {
+            public IExecuteResult Execute(IProvider provider, object[] parentArgs, object[] userArgs)
+            {
+                if (parentArgs == null && !(this.parameters == null || this.parameters.Count == 0))
+                {
                     throw Error.ArgumentNull("arguments");
                 }
 
                 SqlProvider sqlProvider = provider as SqlProvider;
-                if (sqlProvider == null) {
+                if (sqlProvider == null)
+                {
                     throw Error.ArgumentTypeMismatch("provider");
                 }
 
@@ -1500,7 +1758,8 @@ namespace System.Data.Linq.SqlClient {
                 List<SqlParameterInfo> spis = new List<SqlParameterInfo>(this.queryInfo.Parameters);
 
                 // add call arguments
-                for (int i = 0, n = this.parameters.Count; i < n; i++) {
+                for (int i = 0, n = this.parameters.Count; i < n; i++)
+                {
                     spis.Add(new SqlParameterInfo(this.parameters[i], parentArgs[i]));
                 }
 
@@ -1517,7 +1776,8 @@ namespace System.Data.Linq.SqlClient {
             }
         }
 
-        class ExecuteResult : IExecuteResult, IDisposable {
+        class ExecuteResult : IExecuteResult, IDisposable
+        {
             DbCommand command;
             ReadOnlyCollection<SqlParameterInfo> parameters;
             IObjectReaderSession session;
@@ -1528,42 +1788,53 @@ namespace System.Data.Linq.SqlClient {
             bool isDisposed;
 
             internal ExecuteResult(DbCommand command, ReadOnlyCollection<SqlParameterInfo> parameters, IObjectReaderSession session, object value, bool useReturnValue)
-                : this(command, parameters, session) {
+                : this(command, parameters, session)
+            {
                 this.value = value;
                 this.useReturnValue = useReturnValue;
-                if (this.command != null && this.parameters != null && useReturnValue) {
+                if (this.command != null && this.parameters != null && useReturnValue)
+                {
                     iReturnParameter = GetParameterIndex("@RETURN_VALUE");
                 }
             }
 
-            internal ExecuteResult(DbCommand command, ReadOnlyCollection<SqlParameterInfo> parameters, IObjectReaderSession session) {
+            internal ExecuteResult(DbCommand command, ReadOnlyCollection<SqlParameterInfo> parameters, IObjectReaderSession session)
+            {
                 this.command = command;
                 this.parameters = parameters;
                 this.session = session;
             }
 
             internal ExecuteResult(DbCommand command, ReadOnlyCollection<SqlParameterInfo> parameters, IObjectReaderSession session, object value)
-                : this(command, parameters, session, value, false) {
+                : this(command, parameters, session, value, false)
+            {
             }
 
-            [SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "value", Justification="FxCop Error -- False positive during code analysis")]
-            public object ReturnValue {
-                get {
-                    if (this.iReturnParameter >= 0) {
+            [SuppressMessage("Microsoft.Maintainability", "CA1500:VariableNamesShouldNotMatchFieldNames", MessageId = "value", Justification = "FxCop Error -- False positive during code analysis")]
+            public object ReturnValue
+            {
+                get
+                {
+                    if (this.iReturnParameter >= 0)
+                    {
                         return this.GetParameterValue(this.iReturnParameter);
                     }
                     return this.value;
                 }
-                internal set {
+                internal set
+                {
                     Debug.Assert(!useReturnValue);
                     this.value = value;
                 }
             }
 
-            private int GetParameterIndex(string paramName) {
+            private int GetParameterIndex(string paramName)
+            {
                 int idx = -1;
-                for (int i = 0, n = this.parameters.Count; i < n; i++) {
-                    if (string.Compare(parameters[i].Parameter.Name, paramName, StringComparison.OrdinalIgnoreCase) == 0) {
+                for (int i = 0, n = this.parameters.Count; i < n; i++)
+                {
+                    if (string.Compare(parameters[i].Parameter.Name, paramName, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
                         idx = i;
                         break;
                     }
@@ -1571,72 +1842,89 @@ namespace System.Data.Linq.SqlClient {
                 return idx;
             }
 
-            internal object GetParameterValue(string paramName) {
+            internal object GetParameterValue(string paramName)
+            {
                 int idx = GetParameterIndex(paramName);
-                if (idx >= 0) {
+                if (idx >= 0)
+                {
                     return GetParameterValue(idx);
                 }
                 return null;
             }
 
-            public object GetParameterValue(int parameterIndex) {
-                if (this.parameters == null || parameterIndex < 0 || parameterIndex > this.parameters.Count) {
+            public object GetParameterValue(int parameterIndex)
+            {
+                if (this.parameters == null || parameterIndex < 0 || parameterIndex > this.parameters.Count)
+                {
                     throw Error.ArgumentOutOfRange("parameterIndex");
                 }
 
                 // SQL server requires all results to be read before output parameters are visible
-                if (this.session != null && !this.session.IsBuffered) {
+                if (this.session != null && !this.session.IsBuffered)
+                {
                     this.session.Buffer();
                 }
 
                 SqlParameterInfo pi = this.parameters[parameterIndex];
                 object parameterValue = this.command.Parameters[parameterIndex].Value;
                 if (parameterValue == DBNull.Value) parameterValue = null;
-                if (parameterValue != null && parameterValue.GetType() != pi.Parameter.ClrType) {
+                if (parameterValue != null && parameterValue.GetType() != pi.Parameter.ClrType)
+                {
                     return DBConvert.ChangeType(parameterValue, pi.Parameter.ClrType);
                 }
 
                 return parameterValue;
             }
 
-            public void Dispose() {
-                if (!this.isDisposed) {
+            public void Dispose()
+            {
+                if (!this.isDisposed)
+                {
                     // Technically, calling GC.SuppressFinalize is not required because the class does not
                     // have a finalizer, but it does no harm, protects against the case where a finalizer is added
                     // in the future, and prevents an FxCop warning.
                     GC.SuppressFinalize(this);
                     this.isDisposed = true;
-                    if (this.session!=null) {
+                    if (this.session != null)
+                    {
                         this.session.Dispose();
                     }
                 }
             }
         }
 
-        class SequenceOfOne<T> : IEnumerable<T>, IEnumerable {
+        class SequenceOfOne<T> : IEnumerable<T>, IEnumerable
+        {
             T[] sequence;
-            internal SequenceOfOne(T value) {
+            internal SequenceOfOne(T value)
+            {
                 this.sequence = new T[] { value };
             }
-            public IEnumerator<T> GetEnumerator() {
+            public IEnumerator<T> GetEnumerator()
+            {
                 return ((IEnumerable<T>)this.sequence).GetEnumerator();
             }
 
-            IEnumerator IEnumerable.GetEnumerator() {
+            IEnumerator IEnumerable.GetEnumerator()
+            {
                 return this.GetEnumerator();
             }
         }
 
-        class OneTimeEnumerable<T> : IEnumerable<T>, IEnumerable {
+        class OneTimeEnumerable<T> : IEnumerable<T>, IEnumerable
+        {
             IEnumerator<T> enumerator;
 
-            internal OneTimeEnumerable(IEnumerator<T> enumerator) {
+            internal OneTimeEnumerable(IEnumerator<T> enumerator)
+            {
                 System.Diagnostics.Debug.Assert(enumerator != null);
                 this.enumerator = enumerator;
             }
 
-            public IEnumerator<T> GetEnumerator() {
-                if (this.enumerator == null) {
+            public IEnumerator<T> GetEnumerator()
+            {
+                if (this.enumerator == null)
+                {
                     throw Error.CannotEnumerateResultsMoreThanOnce();
                 }
                 IEnumerator<T> e = this.enumerator;
@@ -1644,7 +1932,8 @@ namespace System.Data.Linq.SqlClient {
                 return e;
             }
 
-            IEnumerator IEnumerable.GetEnumerator() {
+            IEnumerator IEnumerable.GetEnumerator()
+            {
                 return this.GetEnumerator();
             }
         }
@@ -1652,13 +1941,15 @@ namespace System.Data.Linq.SqlClient {
         /// <summary>
         /// Result type for single rowset returning stored procedures.
         /// </summary>
-        class SingleResult<T> : ISingleResult<T>, IDisposable, IListSource {
+        class SingleResult<T> : ISingleResult<T>, IDisposable, IListSource
+        {
             private IEnumerable<T> enumerable;
             private ExecuteResult executeResult;
             private DataContext context;
             private IBindingList cachedList;
 
-            internal SingleResult(IEnumerable<T> enumerable, ExecuteResult executeResult, DataContext context) {
+            internal SingleResult(IEnumerable<T> enumerable, ExecuteResult executeResult, DataContext context)
+            {
                 System.Diagnostics.Debug.Assert(enumerable != null);
                 System.Diagnostics.Debug.Assert(executeResult != null);
                 this.enumerable = enumerable;
@@ -1666,21 +1957,26 @@ namespace System.Data.Linq.SqlClient {
                 this.context = context;
             }
 
-            public IEnumerator<T> GetEnumerator() {
+            public IEnumerator<T> GetEnumerator()
+            {
                 return enumerable.GetEnumerator();
             }
 
-            IEnumerator IEnumerable.GetEnumerator() {
+            IEnumerator IEnumerable.GetEnumerator()
+            {
                 return this.GetEnumerator();
             }
 
-            public object ReturnValue {
-                get {
+            public object ReturnValue
+            {
+                get
+                {
                     return executeResult.GetParameterValue("@RETURN_VALUE");
                 }
             }
 
-            public void Dispose() {
+            public void Dispose()
+            {
                 // Technically, calling GC.SuppressFinalize is not required because the class does not
                 // have a finalizer, but it does no harm, protects against the case where a finalizer is added
                 // in the future, and prevents an FxCop warning.
@@ -1688,77 +1984,97 @@ namespace System.Data.Linq.SqlClient {
                 this.executeResult.Dispose();
             }
 
-            IList IListSource.GetList() {
-                if (this.cachedList == null) {
+            IList IListSource.GetList()
+            {
+                if (this.cachedList == null)
+                {
                     this.cachedList = BindingList.Create<T>(this.context, this);
                 }
                 return this.cachedList;
             }
 
-            bool IListSource.ContainsListCollection {
+            bool IListSource.ContainsListCollection
+            {
                 get { return false; }
             }
         }
 
-        class MultipleResults : IMultipleResults, IDisposable {
+        class MultipleResults : IMultipleResults, IDisposable
+        {
             SqlProvider provider;
             MetaFunction function;
             IObjectReaderSession session;
             bool isDisposed;
             private ExecuteResult executeResult;
 
-            internal MultipleResults(SqlProvider provider, MetaFunction function, IObjectReaderSession session, ExecuteResult executeResult) {
+            internal MultipleResults(SqlProvider provider, MetaFunction function, IObjectReaderSession session, ExecuteResult executeResult)
+            {
                 this.provider = provider;
                 this.function = function;
                 this.session = session;
                 this.executeResult = executeResult;
             }
 
-            public IEnumerable<T> GetResult<T>() {
+            public IEnumerable<T> GetResult<T>()
+            {
                 MetaType metaType = null;
                 // Check the inheritance hierarchy of each mapped result row type
                 // for the function.
-                if (this.function != null) {
-                    foreach (MetaType mt in function.ResultRowTypes) {
+                if (this.function != null)
+                {
+                    foreach (MetaType mt in function.ResultRowTypes)
+                    {
                         metaType = mt.InheritanceTypes.SingleOrDefault(it => it.Type == typeof(T));
-                        if (metaType != null) {
+                        if (metaType != null)
+                        {
                             break;
                         }
                     }
                 }
-                if (metaType == null) {
+                if (metaType == null)
+                {
                     metaType = this.provider.services.Model.GetMetaType(typeof(T));
                 }
                 IObjectReaderFactory factory = this.provider.GetDefaultFactory(metaType);
                 IObjectReader objReader = factory.GetNextResult(this.session, false);
-                if (objReader == null) {
+                if (objReader == null)
+                {
                     this.Dispose();
                     return null;
                 }
                 return new SingleResult<T>(new OneTimeEnumerable<T>((IEnumerator<T>)objReader), this.executeResult, this.provider.services.Context);
             }
 
-            public void Dispose() {
-                if (!this.isDisposed) {
+            public void Dispose()
+            {
+                if (!this.isDisposed)
+                {
                     // Technically, calling GC.SuppressFinalize is not required because the class does not
                     // have a finalizer, but it does no harm, protects against the case where a finalizer is added
                     // in the future, and prevents an FxCop warning.
                     GC.SuppressFinalize(this);
                     this.isDisposed = true;
-                    if (this.executeResult != null) {
+                    if (this.executeResult != null)
+                    {
                         this.executeResult.Dispose();
                     }
-                    else {
+                    else
+                    {
                         this.session.Dispose();
                     }
                 }
             }
 
-            public object ReturnValue {
-                get {
-                    if (this.executeResult != null) {
+            public object ReturnValue
+            {
+                get
+                {
+                    if (this.executeResult != null)
+                    {
                         return executeResult.GetParameterValue("@RETURN_VALUE");
-                    } else {
+                    }
+                    else
+                    {
                         return null;
                     }
                 }

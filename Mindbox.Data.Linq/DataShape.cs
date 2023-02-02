@@ -9,36 +9,41 @@ using System.Data.Linq.Mapping;
 using System.Data.Linq.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 
-namespace System.Data.Linq {
+namespace System.Data.Linq
+{
     public sealed class DataLoadOptions : IEquatable<DataLoadOptions>
     {
-	    private HashSet<Type> typesToLoadWith = new HashSet<Type>();
+        private HashSet<Type> typesToLoadWith = new HashSet<Type>();
 
         bool frozen;
         Dictionary<MetaPosition, MemberInfo> includes = new Dictionary<MetaPosition, MemberInfo>();
         Dictionary<MetaPosition, LambdaExpression> subqueries = new Dictionary<MetaPosition, LambdaExpression>();
 
-	    /// <summary>
+        /// <summary>
         /// Describe a property that is automatically loaded when the containing instance is loaded
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "[....]: Generic types are an important part of Linq APIs and they could not exist without nested generic support.")]
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "[....]: Need to provide static typing.")]
-        public void LoadWith<T>(Expression<Func<T, object>> expression) {
-            if (expression == null) {
+        public void LoadWith<T>(Expression<Func<T, object>> expression)
+        {
+            if (expression == null)
+            {
                 throw Error.ArgumentNull("expression");
             }
 
-	        typesToLoadWith.Add(typeof(T));
+            typesToLoadWith.Add(typeof(T));
 
             MemberInfo mi = GetLoadWithMemberInfo(expression);
             this.Preload(mi);
         }
 
-	    /// <summary>
+        /// <summary>
         /// Describe a property that is automatically loaded when the containing instance is loaded
         /// </summary>
-        public void LoadWith(LambdaExpression expression) {
-            if (expression == null) {
+        public void LoadWith(LambdaExpression expression)
+        {
+            if (expression == null)
+            {
                 throw Error.ArgumentNull("expression");
             }
             MemberInfo mi = GetLoadWithMemberInfo(expression);
@@ -50,8 +55,10 @@ namespace System.Data.Linq {
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "[....]: Generic types are an important part of Linq APIs and they could not exist without nested generic support.")]
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "[....]: Need to provide static typing.")]
-        public void AssociateWith<T>(Expression<Func<T, object>> expression) {
-            if (expression == null) {
+        public void AssociateWith<T>(Expression<Func<T, object>> expression)
+        {
+            if (expression == null)
+            {
                 throw Error.ArgumentNull("expression");
             }
             this.AssociateWithInternal(expression);
@@ -60,17 +67,21 @@ namespace System.Data.Linq {
         /// <summary>
         /// Place a subquery on the given association.
         /// </summary>
-        public void AssociateWith(LambdaExpression expression) {
-            if (expression == null) {
+        public void AssociateWith(LambdaExpression expression)
+        {
+            if (expression == null)
+            {
                 throw Error.ArgumentNull("expression");
             }
             this.AssociateWithInternal(expression);
         }
 
-        private void AssociateWithInternal(LambdaExpression expression) {
+        private void AssociateWithInternal(LambdaExpression expression)
+        {
             // Strip the cast-to-object.
             Expression op = expression.Body;
-            while (op.NodeType == ExpressionType.Convert || op.NodeType == ExpressionType.ConvertChecked) {
+            while (op.NodeType == ExpressionType.Convert || op.NodeType == ExpressionType.ConvertChecked)
+            {
                 op = ((UnaryExpression)op).Operand;
             }
             LambdaExpression lambda = Expression.Lambda(op, expression.Parameters.ToArray());
@@ -83,8 +94,10 @@ namespace System.Data.Linq {
         /// </summary>
         /// <param name="member">The member this is automatically loaded.</param>
         /// <returns>True if the member is automatically loaded.</returns>
-        internal bool IsPreloaded(MemberInfo member) {
-            if (member == null) {
+        internal bool IsPreloaded(MemberInfo member)
+        {
+            if (member == null)
+            {
                 throw Error.ArgumentNull("member");
             }
             return includes.ContainsKey(new MetaPosition(member));
@@ -96,15 +109,20 @@ namespace System.Data.Linq {
         ///  (2) They are both null or empty
         ///  (3) They contain the same preloaded members
         /// </summary>
-        internal static bool ShapesAreEquivalent(DataLoadOptions ds1, DataLoadOptions ds2) {
+        internal static bool ShapesAreEquivalent(DataLoadOptions ds1, DataLoadOptions ds2)
+        {
             bool shapesAreSameOrEmpty = (ds1 == ds2) || ((ds1 == null || ds1.IsEmpty) && (ds2 == null || ds2.IsEmpty));
-            if (!shapesAreSameOrEmpty) {                
-                if (ds1 == null || ds2 == null || ds1.includes.Count != ds2.includes.Count) {
+            if (!shapesAreSameOrEmpty)
+            {
+                if (ds1 == null || ds2 == null || ds1.includes.Count != ds2.includes.Count)
+                {
                     return false;
                 }
 
-                foreach (MetaPosition metaPosition in ds2.includes.Keys) {
-                    if (!ds1.includes.ContainsKey(metaPosition)) {
+                foreach (MetaPosition metaPosition in ds2.includes.Keys)
+                {
+                    if (!ds1.includes.ContainsKey(metaPosition))
+                    {
                         return false;
                     }
                 }
@@ -117,8 +135,10 @@ namespace System.Data.Linq {
         /// </summary>
         /// <param name="member">The member with the subquery.</param>
         /// <returns></returns>
-        internal LambdaExpression GetAssociationSubquery(MemberInfo member) {
-            if (member == null) {
+        internal LambdaExpression GetAssociationSubquery(MemberInfo member)
+        {
+            if (member == null)
+            {
                 throw Error.ArgumentNull("member");
             }
             LambdaExpression expression = null;
@@ -132,33 +152,36 @@ namespace System.Data.Linq {
         /// </summary>
         internal void Freeze(MetaModel metaModel)
         {
-	        if (frozen)
-		        return;
+            if (frozen)
+                return;
 
             this.frozen = true;
 
-	        ValidateTypesToLoadWith(metaModel);
+            ValidateTypesToLoadWith(metaModel);
         }
 
-	    private void ValidateTypesToLoadWith(MetaModel metaModel)
-	    {
-		    foreach (var typeToLoadWith in typesToLoadWith)
-		    {
-			    var metaType = metaModel.GetMetaType(typeToLoadWith);
-			    if (metaType.HasInheritance && metaType.InheritanceRoot != metaType)
-				    throw new InvalidOperationException($"Type {metaType.Type} is not the root type of the inheritance mapping hierarchy," +
-						$" so it can't be used for automatic loading.");
-		    }
-	    }
+        private void ValidateTypesToLoadWith(MetaModel metaModel)
+        {
+            foreach (var typeToLoadWith in typesToLoadWith)
+            {
+                var metaType = metaModel.GetMetaType(typeToLoadWith);
+                if (metaType.HasInheritance && metaType.InheritanceRoot != metaType)
+                    throw new InvalidOperationException($"Type {metaType.Type} is not the root type of the inheritance mapping hierarchy," +
+                        $" so it can't be used for automatic loading.");
+            }
+        }
 
         /// <summary>
         /// Describe a property that is automatically loaded when the containing instance is loaded
         /// </summary>
-        internal void Preload(MemberInfo association) {
-            if (association == null) {
+        internal void Preload(MemberInfo association)
+        {
+            if (association == null)
+            {
                 throw Error.ArgumentNull("association");
             }
-            if (this.frozen) {
+            if (this.frozen)
+            {
                 throw Error.IncludeNotAllowedAfterFreeze();
             }
 
@@ -169,8 +192,10 @@ namespace System.Data.Linq {
         /// <summary>
         /// Place a subquery on the given association.
         /// </summary>
-        private void Subquery(MemberInfo association, LambdaExpression subquery) {
-            if (this.frozen) {
+        private void Subquery(MemberInfo association, LambdaExpression subquery)
+        {
+            if (this.frozen)
+            {
                 throw Error.SubqueryNotAllowedAfterFreeze();
             }
             subquery = (LambdaExpression)System.Data.Linq.SqlClient.Funcletizer.Funcletize(subquery); // Layering violation.
@@ -205,22 +230,28 @@ namespace System.Data.Linq {
             }
         }
 
-        private static class Searcher {           
-            static internal MemberInfo MemberInfoOf(LambdaExpression lambda) {
+        private static class Searcher
+        {
+            static internal MemberInfo MemberInfoOf(LambdaExpression lambda)
+            {
                 Visitor v = new Visitor();
                 v.VisitLambda(lambda);
                 return v.MemberInfo;
             }
-            private class Visitor : System.Data.Linq.SqlClient.ExpressionVisitor { 
+            private class Visitor : System.Data.Linq.SqlClient.ExpressionVisitor
+            {
                 internal MemberInfo MemberInfo;
-                internal override Expression VisitMemberAccess(MemberExpression m) {
+                internal override Expression VisitMemberAccess(MemberExpression m)
+                {
                     this.MemberInfo = m.Member;
                     return base.VisitMemberAccess(m);
                 }
 
-                internal override Expression VisitMethodCall(MethodCallExpression m) {
+                internal override Expression VisitMethodCall(MethodCallExpression m)
+                {
                     this.Visit(m.Object);
-                    foreach (Expression arg in m.Arguments) {
+                    foreach (Expression arg in m.Arguments)
+                    {
                         this.Visit(arg);
                         break; // Only follow the extension method 'this'
                     }
@@ -230,31 +261,38 @@ namespace System.Data.Linq {
             }
         }
 
-        private void ValidateTypeGraphAcyclic() {
+        private void ValidateTypeGraphAcyclic()
+        {
             IEnumerable<MemberInfo> edges = this.includes.Values;
             int removed = 0;
 
-            for (int loop = 0; loop < this.includes.Count; ++loop) {
+            for (int loop = 0; loop < this.includes.Count; ++loop)
+            {
                 // Build a list of all edge targets.
                 HashSet<Type> edgeTargets = new HashSet<Type>();
-                foreach (MemberInfo edge in edges) {
+                foreach (MemberInfo edge in edges)
+                {
                     edgeTargets.Add(GetIncludeTarget(edge));
                 }
                 // Remove all edges with sources matching no target.
                 List<MemberInfo> newEdges = new List<MemberInfo>();
                 bool someRemoved = false;
-                foreach (MemberInfo edge in edges) {
-                    if (edgeTargets.Where(et=>et.IsAssignableFrom(edge.DeclaringType) || edge.DeclaringType.IsAssignableFrom(et)).Any()) {
+                foreach (MemberInfo edge in edges)
+                {
+                    if (edgeTargets.Where(et => et.IsAssignableFrom(edge.DeclaringType) || edge.DeclaringType.IsAssignableFrom(et)).Any())
+                    {
                         newEdges.Add(edge);
                     }
-                    else {
+                    else
+                    {
                         ++removed;
                         someRemoved = true;
                         if (removed == this.includes.Count)
                             return;
                     }
                 }
-                if (!someRemoved) {
+                if (!someRemoved)
+                {
                     throw Error.IncludeCycleNotAllowed(); // No edges removed, there must be a loop.
                 }
                 edges = newEdges;
@@ -262,26 +300,33 @@ namespace System.Data.Linq {
             throw new InvalidOperationException("Bug in ValidateTypeGraphAcyclic"); // Getting here means a bug.
         }
 
-        private static Type GetIncludeTarget(MemberInfo mi) {
+        private static Type GetIncludeTarget(MemberInfo mi)
+        {
             Type mt = System.Data.Linq.SqlClient.TypeSystem.GetMemberType(mi);
-            if (mt.IsGenericType) {
+            if (mt.IsGenericType)
+            {
                 return mt.GetGenericArguments()[0];
             }
             return mt;
         }
 
-        private static void ValidateSubqueryMember(MemberInfo mi) {
+        private static void ValidateSubqueryMember(MemberInfo mi)
+        {
             Type memberType = System.Data.Linq.SqlClient.TypeSystem.GetMemberType(mi);
-            if (memberType == null) {
+            if (memberType == null)
+            {
                 throw Error.SubqueryNotSupportedOn(mi);
             }
-            if (!typeof(IEnumerable).IsAssignableFrom(memberType)) {
+            if (!typeof(IEnumerable).IsAssignableFrom(memberType))
+            {
                 throw Error.SubqueryNotSupportedOnType(mi.Name, mi.DeclaringType);
             }
         }
 
-        private static void ValidateSubqueryExpression(LambdaExpression subquery) {
-            if (!typeof(IEnumerable).IsAssignableFrom(subquery.Body.Type)) {
+        private static void ValidateSubqueryExpression(LambdaExpression subquery)
+        {
+            if (!typeof(IEnumerable).IsAssignableFrom(subquery.Body.Type))
+            {
                 throw Error.SubqueryMustBeSequence();
             }
             new SubqueryValidator().VisitLambda(subquery);
@@ -290,17 +335,21 @@ namespace System.Data.Linq {
         /// <summary>
         /// Ensure that the subquery follows the rules for subqueries.
         /// </summary>
-        private class SubqueryValidator : System.Data.Linq.SqlClient.ExpressionVisitor { 
+        private class SubqueryValidator : System.Data.Linq.SqlClient.ExpressionVisitor
+        {
             bool isTopLevel = true;
-            internal override Expression VisitMethodCall(MethodCallExpression m) {
+            internal override Expression VisitMethodCall(MethodCallExpression m)
+            {
                 bool was = isTopLevel;
-                try {
+                try
+                {
                     if (isTopLevel && !SubqueryRules.IsSupportedTopLevelMethod(m.Method))
                         throw Error.SubqueryDoesNotSupportOperator(m.Method.Name);
                     isTopLevel = false;
                     return base.VisitMethodCall(m);
                 }
-                finally {
+                finally
+                {
                     isTopLevel = was;
                 }
             }
@@ -309,66 +358,67 @@ namespace System.Data.Linq {
         /// <summary>
         /// Whether there have been LoadOptions specified.
         /// </summary>
-        internal bool IsEmpty {
+        internal bool IsEmpty
+        {
             get { return this.includes.Count == 0 && this.subqueries.Count == 0; }
         }
 
-	    public bool Equals(DataLoadOptions other)
-	    {
-		    if (other == null)
-			    return false;
+        public bool Equals(DataLoadOptions other)
+        {
+            if (other == null)
+                return false;
 
-		    bool areShapesEquivalent = ShapesAreEquivalent(this, other);
-		    if (!areShapesEquivalent)
-			    return false;
+            bool areShapesEquivalent = ShapesAreEquivalent(this, other);
+            if (!areShapesEquivalent)
+                return false;
 
-		    if (other.subqueries.Count != subqueries.Count)
-			    return false;
+            if (other.subqueries.Count != subqueries.Count)
+                return false;
 
-		    if (other.subqueries.Keys.Any(metaPosition => !subqueries.ContainsKey(metaPosition)))
-			    return false;
+            if (other.subqueries.Keys.Any(metaPosition => !subqueries.ContainsKey(metaPosition)))
+                return false;
 
-		    return true;
-	    }
+            return true;
+        }
 
-	    public override bool Equals(object obj)
-	    {
-			return Equals(obj as DataLoadOptions);
-	    }
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as DataLoadOptions);
+        }
 
-	    public override int GetHashCode()
-	    {
-			// We're redefining equality checking to make two equivalent DataLoadOptions instances equals,
-			// hence we must also override GetHashCode.
+        public override int GetHashCode()
+        {
+            // We're redefining equality checking to make two equivalent DataLoadOptions instances equals,
+            // hence we must also override GetHashCode.
 
-			// Unfortunately, DataLoadOptions fields are all mutable so we're left with the choice:
-			// 1) Return different hashe values at different points in object lifecycle
-			// 2) Return the same hash value for all instances
+            // Unfortunately, DataLoadOptions fields are all mutable so we're left with the choice:
+            // 1) Return different hashe values at different points in object lifecycle
+            // 2) Return the same hash value for all instances
 
-			// Since the objects is Freezable, so there is an explicit point in time at which it becomes "usable",
-			// and since it's very unlikely that someone will put such objects in a hash table before setting up the includes,
-			// we're going with option 1. 
+            // Since the objects is Freezable, so there is an explicit point in time at which it becomes "usable",
+            // and since it's very unlikely that someone will put such objects in a hash table before setting up the includes,
+            // we're going with option 1. 
 
-			// This WILL BREAK the behavior of some data structures is someone puts DataLoadOptions
-			// in a hash table before setting up all the options.
+            // This WILL BREAK the behavior of some data structures is someone puts DataLoadOptions
+            // in a hash table before setting up all the options.
 
-		    unchecked
-		    {
-			    int includesHash = 0;
-			    foreach (var include in includes)
-				    includesHash += include.Key.GetHashCode();
+            unchecked
+            {
+                int includesHash = 0;
+                foreach (var include in includes)
+                    includesHash += include.Key.GetHashCode();
 
-			    int subqueriesHash = 0;
-			    foreach (var query in subqueries)
-				    subqueriesHash += query.Key.GetHashCode();
+                int subqueriesHash = 0;
+                foreach (var query in subqueries)
+                    subqueriesHash += query.Key.GetHashCode();
 
-			    int hash = 3
-					+ 23 * includesHash
-					+ 31 * subqueriesHash;
-					
-			    return hash;
-		    }
-		    
-	    }
+                int hash = 3
+                    + 23 * includesHash
+                    + 31 * subqueriesHash;
+
+                return hash;
+            }
+
+        }
     }
 }

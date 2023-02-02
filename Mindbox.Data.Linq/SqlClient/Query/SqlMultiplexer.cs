@@ -3,27 +3,33 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Data.Linq;
 
-namespace System.Data.Linq.SqlClient {
+namespace System.Data.Linq.SqlClient
+{
 
     // convert multiset & element expressions into separate queries
 
-    internal class SqlMultiplexer {
+    internal class SqlMultiplexer
+    {
         Visitor visitor;
 
-        internal enum Options {
+        internal enum Options
+        {
             None,
             EnableBigJoin
         }
 
-        internal SqlMultiplexer(Options options, IEnumerable<System.Data.Linq.SqlClient.SqlParameter> parentParameters, SqlFactory sqlFactory) {
+        internal SqlMultiplexer(Options options, IEnumerable<System.Data.Linq.SqlClient.SqlParameter> parentParameters, SqlFactory sqlFactory)
+        {
             this.visitor = new Visitor(options, parentParameters, sqlFactory);
         }
 
-        internal SqlNode Multiplex(SqlNode node) {
+        internal SqlNode Multiplex(SqlNode node)
+        {
             return this.visitor.Visit(node);
         }
 
-        class Visitor : SqlVisitor {
+        class Visitor : SqlVisitor
+        {
             Options options;
             SqlFactory sql;
             SqlSelect outerSelect;
@@ -32,7 +38,8 @@ namespace System.Data.Linq.SqlClient {
             bool isTopLevel;
             IEnumerable<System.Data.Linq.SqlClient.SqlParameter> parentParameters;
 
-            internal Visitor(Options options, IEnumerable<System.Data.Linq.SqlClient.SqlParameter> parentParameters, SqlFactory sqlFactory) {
+            internal Visitor(Options options, IEnumerable<System.Data.Linq.SqlClient.SqlParameter> parentParameters, SqlFactory sqlFactory)
+            {
                 this.options = options;
                 this.sql = sqlFactory;
                 this.canJoin = true;
@@ -40,12 +47,14 @@ namespace System.Data.Linq.SqlClient {
                 this.parentParameters = parentParameters;
             }
 
-            internal override SqlExpression VisitMultiset(SqlSubSelect sms) {
+            internal override SqlExpression VisitMultiset(SqlSubSelect sms)
+            {
                 // allow one big-join per query?
                 if ((this.options & Options.EnableBigJoin) != 0 &&
                     !this.hasBigJoin && this.canJoin && this.isTopLevel && this.outerSelect != null
-                    && !MultisetChecker.HasMultiset(sms.Select.Selection) 
-                    && BigJoinChecker.CanBigJoin(sms.Select)) {
+                    && !MultisetChecker.HasMultiset(sms.Select.Selection)
+                    && BigJoinChecker.CanBigJoin(sms.Select))
+                {
 
                     sms.Select = this.VisitSelect(sms.Select);
 
@@ -69,44 +78,53 @@ namespace System.Data.Linq.SqlClient {
                     this.hasBigJoin = true;
                     return jc;
                 }
-                else {
+                else
+                {
                     return QueryExtractor.Extract(sms, this.parentParameters);
                 }
             }
 
-            internal override SqlExpression VisitElement(SqlSubSelect elem) {
+            internal override SqlExpression VisitElement(SqlSubSelect elem)
+            {
                 return QueryExtractor.Extract(elem, this.parentParameters);
             }
 
-            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss) {
+            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss)
+            {
                 bool saveIsTopLevel = this.isTopLevel;
                 this.isTopLevel = false;
                 bool saveCanJoin = this.canJoin;
                 this.canJoin = false;
-                try {
+                try
+                {
                     return base.VisitScalarSubSelect(ss);
                 }
-                finally {
+                finally
+                {
                     this.isTopLevel = saveIsTopLevel;
                     this.canJoin = saveCanJoin;
                 }
             }
 
-            internal override SqlExpression VisitExists(SqlSubSelect ss) {
+            internal override SqlExpression VisitExists(SqlSubSelect ss)
+            {
                 bool saveIsTopLevel = this.isTopLevel;
                 this.isTopLevel = false;
                 bool saveCanJoin = this.canJoin;
                 this.canJoin = false;
-                try {
+                try
+                {
                     return base.VisitExists(ss);
                 }
-                finally {
+                finally
+                {
                     this.isTopLevel = saveIsTopLevel;
                     this.canJoin = saveCanJoin;
                 }
             }
 
-            internal override SqlSelect VisitSelect(SqlSelect select) {
+            internal override SqlSelect VisitSelect(SqlSelect select)
+            {
                 SqlSelect saveSelect = this.outerSelect;
                 this.outerSelect = select;
 
@@ -124,85 +142,106 @@ namespace System.Data.Linq.SqlClient {
                 this.isTopLevel = saveIsTopLevel;
                 this.outerSelect = saveSelect;
 
-                if (select.IsDistinct && HierarchyChecker.HasHierarchy(select.Selection)) {
+                if (select.IsDistinct && HierarchyChecker.HasHierarchy(select.Selection))
+                {
                     // distinct across heirarchy is a NO-OP
                     select.IsDistinct = false;
                 }
                 return select;
             }
 
-            internal override SqlNode VisitUnion(SqlUnion su) {
+            internal override SqlNode VisitUnion(SqlUnion su)
+            {
                 this.canJoin = false;
                 return base.VisitUnion(su);
             }
 
-            internal override SqlExpression VisitClientCase(SqlClientCase c) {
+            internal override SqlExpression VisitClientCase(SqlClientCase c)
+            {
                 bool saveCanJoin = this.canJoin;
                 this.canJoin = false;
-                try {
+                try
+                {
                     return base.VisitClientCase(c);
                 }
-                finally {
+                finally
+                {
                     this.canJoin = saveCanJoin;
                 }
             }
 
-            internal override SqlExpression VisitSimpleCase(SqlSimpleCase c) {
+            internal override SqlExpression VisitSimpleCase(SqlSimpleCase c)
+            {
                 bool saveCanJoin = this.canJoin;
                 this.canJoin = false;
-                try {
+                try
+                {
                     return base.VisitSimpleCase(c);
                 }
-                finally {
+                finally
+                {
                     this.canJoin = saveCanJoin;
                 }
             }
 
-            internal override SqlExpression VisitSearchedCase(SqlSearchedCase c) {
+            internal override SqlExpression VisitSearchedCase(SqlSearchedCase c)
+            {
                 bool saveCanJoin = this.canJoin;
                 this.canJoin = false;
-                try {
+                try
+                {
                     return base.VisitSearchedCase(c);
                 }
-                finally {
+                finally
+                {
                     this.canJoin = saveCanJoin;
                 }
             }
 
-            internal override SqlExpression VisitTypeCase(SqlTypeCase tc) {
+            internal override SqlExpression VisitTypeCase(SqlTypeCase tc)
+            {
                 bool saveCanJoin = this.canJoin;
                 this.canJoin = false;
-                try {
+                try
+                {
                     return base.VisitTypeCase(tc);
                 }
-                finally {
+                finally
+                {
                     this.canJoin = saveCanJoin;
                 }
             }
 
-            internal override SqlExpression VisitOptionalValue(SqlOptionalValue sov) {
+            internal override SqlExpression VisitOptionalValue(SqlOptionalValue sov)
+            {
                 bool saveCanJoin = this.canJoin;
                 this.canJoin = false;
-                try {
+                try
+                {
                     return base.VisitOptionalValue(sov);
                 }
-                finally {
+                finally
+                {
                     this.canJoin = saveCanJoin;
                 }
             }
 
-            internal override SqlUserQuery VisitUserQuery(SqlUserQuery suq) {
+            internal override SqlUserQuery VisitUserQuery(SqlUserQuery suq)
+            {
                 this.canJoin = false;
                 return base.VisitUserQuery(suq);
             }
         }
     }
 
-    internal class QueryExtractor {
+    internal class QueryExtractor
+    {
 
-        internal static SqlClientQuery Extract(SqlSubSelect subquery, IEnumerable<System.Data.Linq.SqlClient.SqlParameter> parentParameters) {
+        internal static SqlClientQuery Extract(SqlSubSelect subquery, IEnumerable<System.Data.Linq.SqlClient.SqlParameter> parentParameters)
+        {
             SqlClientQuery cq = new SqlClientQuery(subquery);
-            if (parentParameters != null) {
+            if (parentParameters != null)
+            {
                 cq.Parameters.AddRange(parentParameters);
             }
             Visitor v = new Visitor(cq.Arguments, cq.Parameters);
@@ -210,35 +249,43 @@ namespace System.Data.Linq.SqlClient {
             return cq;
         }
 
-        class Visitor : SqlDuplicator.DuplicatingVisitor {
+        class Visitor : SqlDuplicator.DuplicatingVisitor
+        {
             List<SqlExpression> externals;
             List<SqlParameter> parameters;
 
             internal Visitor(List<SqlExpression> externals, List<SqlParameter> parameters)
-                : base(true) {
+                : base(true)
+            {
                 this.externals = externals;
                 this.parameters = parameters;
             }
 
-            internal override SqlExpression VisitColumnRef(SqlColumnRef cref) {
+            internal override SqlExpression VisitColumnRef(SqlColumnRef cref)
+            {
                 SqlExpression result = base.VisitColumnRef(cref);
-                if (result == cref) { // must be external
+                if (result == cref)
+                { // must be external
                     return ExtractParameter(result);
                 }
                 return result;
             }
 
-            internal override SqlExpression VisitUserColumn(SqlUserColumn suc) {
+            internal override SqlExpression VisitUserColumn(SqlUserColumn suc)
+            {
                 SqlExpression result = base.VisitUserColumn(suc);
-                if (result == suc) { // must be external
+                if (result == suc)
+                { // must be external
                     return ExtractParameter(result);
                 }
                 return result;
             }
 
-            private SqlExpression ExtractParameter(SqlExpression expr) {
+            private SqlExpression ExtractParameter(SqlExpression expr)
+            {
                 Type clrType = expr.ClrType;
-                if (expr.ClrType.IsValueType && !TypeSystem.IsNullableType(expr.ClrType)) {
+                if (expr.ClrType.IsValueType && !TypeSystem.IsNullableType(expr.ClrType))
+                {
                     clrType = typeof(Nullable<>).MakeGenericType(expr.ClrType);
                 }
                 this.externals.Add(expr);
@@ -247,12 +294,14 @@ namespace System.Data.Linq.SqlClient {
                 return sp;
             }
 
-            internal override SqlNode VisitLink(SqlLink link) {
+            internal override SqlNode VisitLink(SqlLink link)
+            {
                 // Don't visit the Expression/Expansion for this link.
                 // Any additional external refs in these expressions
                 // should be ignored
                 SqlExpression[] exprs = new SqlExpression[link.KeyExpressions.Count];
-                for (int i = 0, n = exprs.Length; i < n; i++) {
+                for (int i = 0, n = exprs.Length; i < n; i++)
+                {
                     exprs[i] = this.VisitExpression(link.KeyExpressions[i]);
                 }
                 return new SqlLink(new object(), link.RowType, link.ClrType, link.SqlType, null, link.Member, exprs, null, link.SourceExpression);
@@ -260,108 +309,134 @@ namespace System.Data.Linq.SqlClient {
         }
     }
 
-    internal class HierarchyChecker {
-        internal static bool HasHierarchy(SqlExpression expr) {
+    internal class HierarchyChecker
+    {
+        internal static bool HasHierarchy(SqlExpression expr)
+        {
             Visitor v = new Visitor();
             v.Visit(expr);
             return v.foundHierarchy;
         }
 
-        class Visitor : SqlVisitor {
+        class Visitor : SqlVisitor
+        {
             internal bool foundHierarchy;
 
-            internal override SqlExpression VisitMultiset(SqlSubSelect sms) {
+            internal override SqlExpression VisitMultiset(SqlSubSelect sms)
+            {
                 this.foundHierarchy = true;
                 return sms;
             }
 
-            internal override SqlExpression VisitElement(SqlSubSelect elem) {
+            internal override SqlExpression VisitElement(SqlSubSelect elem)
+            {
                 this.foundHierarchy = true;
                 return elem;
             }
 
-            internal override SqlExpression VisitClientQuery(SqlClientQuery cq) {
+            internal override SqlExpression VisitClientQuery(SqlClientQuery cq)
+            {
                 this.foundHierarchy = true;
                 return cq;
             }
 
-            internal override SqlExpression VisitExists(SqlSubSelect ss) {
+            internal override SqlExpression VisitExists(SqlSubSelect ss)
+            {
                 return ss;
             }
 
-            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss) {
+            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss)
+            {
                 return ss;
             }
         }
     }
 
-    internal class MultisetChecker {
-        internal static bool HasMultiset(SqlExpression expr) {
+    internal class MultisetChecker
+    {
+        internal static bool HasMultiset(SqlExpression expr)
+        {
             Visitor v = new Visitor();
             v.Visit(expr);
             return v.foundMultiset;
         }
 
-        class Visitor : SqlVisitor {
+        class Visitor : SqlVisitor
+        {
             internal bool foundMultiset;
 
-            internal override SqlExpression VisitMultiset(SqlSubSelect sms) {
+            internal override SqlExpression VisitMultiset(SqlSubSelect sms)
+            {
                 this.foundMultiset = true;
                 return sms;
             }
 
-            internal override SqlExpression VisitElement(SqlSubSelect elem) {
+            internal override SqlExpression VisitElement(SqlSubSelect elem)
+            {
                 return elem;
             }
 
-            internal override SqlExpression VisitClientQuery(SqlClientQuery cq) {
+            internal override SqlExpression VisitClientQuery(SqlClientQuery cq)
+            {
                 return cq;
             }
 
-            internal override SqlExpression VisitExists(SqlSubSelect ss) {
+            internal override SqlExpression VisitExists(SqlSubSelect ss)
+            {
                 return ss;
             }
 
-            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss) {
+            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss)
+            {
                 return ss;
             }
         }
     }
 
-    internal class BigJoinChecker {
-        internal static bool CanBigJoin(SqlSelect select) {
+    internal class BigJoinChecker
+    {
+        internal static bool CanBigJoin(SqlSelect select)
+        {
             Visitor v = new Visitor();
             v.Visit(select);
             return v.canBigJoin;
         }
 
-        class Visitor : SqlVisitor {
+        class Visitor : SqlVisitor
+        {
             internal bool canBigJoin = true;
 
-            internal override SqlExpression VisitMultiset(SqlSubSelect sms) {
+            internal override SqlExpression VisitMultiset(SqlSubSelect sms)
+            {
                 return sms;
             }
 
-            internal override SqlExpression VisitElement(SqlSubSelect elem) {
+            internal override SqlExpression VisitElement(SqlSubSelect elem)
+            {
                 return elem;
             }
 
-            internal override SqlExpression VisitClientQuery(SqlClientQuery cq) {
+            internal override SqlExpression VisitClientQuery(SqlClientQuery cq)
+            {
                 return cq;
             }
 
-            internal override SqlExpression VisitExists(SqlSubSelect ss) {
+            internal override SqlExpression VisitExists(SqlSubSelect ss)
+            {
                 return ss;
             }
 
-            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss) {
+            internal override SqlExpression VisitScalarSubSelect(SqlSubSelect ss)
+            {
                 return ss;
             }
 
-            internal override SqlSelect VisitSelect(SqlSelect select) {
+            internal override SqlSelect VisitSelect(SqlSelect select)
+            {
                 // big-joins may need to lift PK's out for default ordering, so don't allow big-join if we see these
                 this.canBigJoin &= select.GroupBy.Count == 0 && select.Top == null && !select.IsDistinct;
-                if (!this.canBigJoin) {
+                if (!this.canBigJoin)
+                {
                     return select;
                 }
                 return base.VisitSelect(select);

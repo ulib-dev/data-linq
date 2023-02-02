@@ -1,9 +1,9 @@
 ﻿namespace System.Data.Linq.Mapping
 {
-	public enum UpdateCheck 
-	{
-		Always,
-		Never,
-		WhenChanged
-	}
+    public enum UpdateCheck
+    {
+        Always,
+        Never,
+        WhenChanged
+    }
 }
