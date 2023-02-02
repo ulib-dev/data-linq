@@ -47,7 +47,7 @@ namespace System.Data.Linq
                 }
                 else
                 {
-#if NET6_0_OR_GREATER
+#if !NETFRAMEWORK
                     throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
 #else
                     BinaryFormatter formatter = new BinaryFormatter();
@@ -73,7 +73,7 @@ namespace System.Data.Linq
                 }
                 else
                 {
-#if NET6_0_OR_GREATER
+#if !NETFRAMEWORK
                     throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
 #else
                     BinaryFormatter formatter = new BinaryFormatter();
@@ -94,7 +94,7 @@ namespace System.Data.Linq
                 }
                 else
                 {
-#if NET6_0_OR_GREATER
+#if !NETFRAMEWORK
                     throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
 #else
                     BinaryFormatter formatter = new BinaryFormatter();
@@ -114,7 +114,7 @@ namespace System.Data.Linq
                 }
                 else
                 {
-#if NET6_0_OR_GREATER
+#if !NETFRAMEWORK
                     throw new NotSupportedException("SYSLIB0011: BinaryFormatter serialization is obsolete");
 #else
                     BinaryFormatter formatter = new BinaryFormatter();
