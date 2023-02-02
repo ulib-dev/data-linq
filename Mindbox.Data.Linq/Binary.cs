@@ -28,7 +28,7 @@ namespace System.Data.Linq
 
 
         [DataMember(Name = "Bytes")]
-        private byte[] bytes;
+        private readonly byte[] bytes;
 
         [NonSerialized]
         private int? hashCode;
@@ -111,9 +111,9 @@ namespace System.Data.Linq
         {
             var currentHashCode = 0;
             var currentByteMultiplier = 314;
-            foreach (var currentByte in bytes)
+            for (var i = 0; i < bytes.Length; i++)
             {
-                currentHashCode = currentHashCode * currentByteMultiplier + currentByte;
+                currentHashCode = currentHashCode * currentByteMultiplier + bytes[i];
                 currentByteMultiplier = currentByteMultiplier * 159;
             }
             hashCode = currentHashCode;
