@@ -966,9 +966,6 @@ namespace System.Data.Linq.SqlClient
 
             private Type GenerateNew(SqlNew sn)
             {
-                if (compiler.services.Model.ShouldEntityProxyBeCreated(sn.ClrType))
-                    return GenerateNewProxy(sn);
-
                 var locInstance = gen.DeclareLocal(sn.ClrType);
 
                 // read all arg values
