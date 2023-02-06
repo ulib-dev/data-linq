@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30128.74
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33318.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mindbox.Data.Linq", "Mindbox.Data.Linq\Mindbox.Data.Linq.csproj", "{47EE70C4-FF67-4810-9AC6-D72A61ABA852}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Data.Linq", "Mindbox.Data.Linq\System.Data.Linq.csproj", "{47EE70C4-FF67-4810-9AC6-D72A61ABA852}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
