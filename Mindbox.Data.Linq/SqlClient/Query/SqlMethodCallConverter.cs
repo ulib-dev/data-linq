@@ -201,8 +201,29 @@ namespace System.Data.Linq.SqlClient
             {
                 best = ms;
             }
+            ms = GetCustomMethodSupport(mc);
+            if (ms > best)
+            {
+                best = ms;
+            }
 
             return best;
+        }
+
+        private static MethodSupport GetCustomMethodSupport(SqlMethodCall mc)
+        {
+            if (IsCustomMethod(mc))
+            {
+                return MethodSupport.Method;
+            }
+            return MethodSupport.None;
+        }
+
+        private static bool IsCustomMethod(SqlMethodCall mc)
+        {
+            return mc.Method.IsStatic
+                && mc.Method.DeclaringType.Name.Contains("SqlMethods")
+                && mc.Method.GetCustomAttributes(typeof(SqlMethodAttribute), false).Length > 0;
         }
 
         private static MethodSupport GetCoercionMethodSupport(SqlMethodCall mc)
@@ -1118,6 +1139,10 @@ namespace System.Data.Linq.SqlClient
                     else if (IsVbLike(mc))
                     {
                         return TranslateVbLikeString(mc);
+                    }
+                    else if (IsCustomMethod(mc))
+                    {
+                        return TranslateCustomMethod(mc);
                     }
 
                     //Recognized pattern has set return value so return
@@ -2903,6 +2928,12 @@ namespace System.Data.Linq.SqlClient
                 }
                 SqlExpression escape = needsEscape ? sql.ValueFromObject("~", false, mc.SourceExpression) : null;
                 return sql.Like(mc.Arguments[0], pattern, escape, source);
+            }
+
+            private SqlExpression TranslateCustomMethod(SqlMethodCall mc)
+            {
+                var attr = (SqlMethodAttribute)mc.Method.GetCustomAttributes(typeof(SqlMethodAttribute), false)[0];
+                return sql.FunctionCall(mc.Method.ReturnType, attr.FunctionName, mc.Arguments, mc.SourceExpression);
             }
         }
     }
