@@ -106,6 +106,8 @@ namespace System.Data.Linq
         {
         }
 
+        public IDataServices DataServices => services;
+
 
         /// <summary>
         /// The connection object used by this DataContext when executing queries and commands.

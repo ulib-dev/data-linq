@@ -13,13 +13,23 @@ namespace System.Data.Linq
     using System.Data.Linq.Mapping;
     using System.Data.Linq.Provider;
 
-    internal sealed class DataQuery<T> : IOrderedQueryable<T>, IQueryProvider, IEnumerable<T>, IOrderedQueryable, IEnumerable, IListSource
+    public class DataQuery
+    {
+        public DataContext Context { get; }
+
+        public DataQuery(DataContext context)
+        {
+            Context = context;
+        }
+    }
+
+    internal sealed class DataQuery<T> : DataQuery, IOrderedQueryable<T>, IQueryProvider, IEnumerable<T>, IOrderedQueryable, IEnumerable, IListSource
     {
         DataContext context;
         Expression queryExpression;
         private IBindingList cachedList;
 
-        public DataQuery(DataContext context, Expression expression)
+        public DataQuery(DataContext context, Expression expression) : base(context)
         {
             this.context = context;
             this.queryExpression = expression;

@@ -9,7 +9,7 @@ namespace System.Data.Linq.Provider
 {
     using System.Data.Linq.Mapping;
 
-    internal interface IDataServices
+    public interface IDataServices
     {
         DataContext Context { get; }
         MetaModel Model { get; }
@@ -20,7 +20,7 @@ namespace System.Data.Linq.Provider
         void OnEntityMaterialized(MetaType type, object instance);
     }
 
-    internal interface IDeferredSourceFactory
+    public interface IDeferredSourceFactory
     {
         IEnumerable CreateDeferredSource(object instance);
         IEnumerable CreateDeferredSource(object[] keyValues);
