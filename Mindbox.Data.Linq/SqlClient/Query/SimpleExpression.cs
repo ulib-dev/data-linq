@@ -77,6 +77,7 @@ namespace System.Data.Linq.SqlClient
                     case SqlNodeType.Between:
                     case SqlNodeType.Concat:
                     case SqlNodeType.Convert:
+                    case SqlNodeType.TryConvert:
                     case SqlNodeType.Treat:
                     case SqlNodeType.Member:
                     case SqlNodeType.TypeCase:

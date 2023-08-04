@@ -79,6 +79,7 @@ namespace System.Data.Linq.SqlClient
                     case SqlNodeType.FunctionCall:
                     case SqlNodeType.MethodCall:
                     case SqlNodeType.Convert: // Object identity does not survive convert. It does survive Cast.
+                    case SqlNodeType.TryConvert:
                         // Dig no further.
                         return node;
                     case SqlNodeType.TypeCase:

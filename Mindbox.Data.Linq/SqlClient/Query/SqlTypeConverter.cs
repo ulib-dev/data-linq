@@ -86,7 +86,7 @@ namespace System.Data.Linq.SqlClient
         internal override SqlExpression VisitUnaryOperator(SqlUnary uo)
         {
             uo.Operand = this.VisitExpression(uo.Operand);
-            if (uo.NodeType != SqlNodeType.Convert)
+            if (uo.NodeType != SqlNodeType.Convert && uo.NodeType != SqlNodeType.TryConvert)
             {
                 return uo;
             }

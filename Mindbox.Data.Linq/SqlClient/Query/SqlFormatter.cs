@@ -188,8 +188,15 @@ namespace System.Data.Linq.SqlClient
                             break;
                         }
                     case SqlNodeType.Convert:
+                    case SqlNodeType.TryConvert:
                         {
-                            this.sb.Append("CONVERT(");
+                            this.sb.Append(uo.NodeType switch
+                            {
+                                SqlNodeType.Convert => "CONVERT(",
+                                SqlNodeType.TryConvert => "TRY_CONVERT(",
+                                _ => throw Error.InvalidFormatNode(uo.NodeType),
+                            });
+
                             QueryFormatOptions options = QueryFormatOptions.None;
                             if (uo.Operand.SqlType.CanSuppressSizeForConversionToString)
                             {

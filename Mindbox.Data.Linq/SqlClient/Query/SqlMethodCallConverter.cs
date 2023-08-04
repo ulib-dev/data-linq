@@ -320,6 +320,10 @@ namespace System.Data.Linq.SqlClient
                 {
                     return MethodSupport.Method;
                 }
+                else if (mc.Method.Name == "TryConvert")
+                {
+                    return MethodSupport.Method;
+                }
             }
             return MethodSupport.None;
         }
@@ -1266,6 +1270,11 @@ namespace System.Data.Linq.SqlClient
                 else if (name == "RawLength")
                 {
                     SqlExpression length = sql.DATALENGTH(mc.Arguments[0]);
+                    return length;
+                }
+                else if (name == "TryConvert")
+                {
+                    SqlExpression length = sql.TryConvertTo(mc.ClrType, mc.Arguments[0]);
                     return length;
                 }
 

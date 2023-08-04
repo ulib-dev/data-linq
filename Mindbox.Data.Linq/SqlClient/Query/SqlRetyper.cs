@@ -37,7 +37,7 @@ namespace System.Data.Linq.SqlClient
             internal override SqlExpression VisitUnaryOperator(SqlUnary uo)
             {
                 base.VisitUnaryOperator(uo);
-                if (uo.NodeType != SqlNodeType.Convert && uo.Operand != null && uo.Operand.SqlType != null)
+                if (uo.NodeType != SqlNodeType.Convert && uo.NodeType != SqlNodeType.TryConvert && uo.Operand != null && uo.Operand.SqlType != null)
                 {
                     uo.SetSqlType(this.typeProvider.PredictTypeForUnary(uo.NodeType, uo.Operand.SqlType));
                 }

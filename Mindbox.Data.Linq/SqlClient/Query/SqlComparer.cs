@@ -101,6 +101,7 @@ namespace System.Data.Linq.SqlClient
                     return AreEqual(firstNode.Left, secondNode.Left)
                         && AreEqual(firstNode.Right, secondNode.Right);
                 case SqlNodeType.Convert:
+                case SqlNodeType.TryConvert:
                 case SqlNodeType.Treat:
                     {
                         SqlUnary sun1 = (SqlUnary)node1;

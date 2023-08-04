@@ -32,6 +32,7 @@ namespace System.Data.Linq.SqlClient
                 case SqlNodeType.Avg:
                 case SqlNodeType.Stddev:
                 case SqlNodeType.Convert:
+                case SqlNodeType.TryConvert:
                 case SqlNodeType.ValueOf:
                 case SqlNodeType.OuterJoinedValue:
                 case SqlNodeType.ClrLength:
@@ -64,6 +65,7 @@ namespace System.Data.Linq.SqlClient
                 case SqlNodeType.Avg:
                 case SqlNodeType.Stddev:
                 case SqlNodeType.Convert:
+                case SqlNodeType.TryConvert:
                 case SqlNodeType.ValueOf:
                 case SqlNodeType.OuterJoinedValue:
                 case SqlNodeType.ClrLength:

@@ -663,6 +663,18 @@ namespace System.Data.Linq.SqlClient
         {
             throw Error.SqlMethodOnlyForSql(MethodInfo.GetCurrentMethod());
         }
+
+        /// <summary>
+        /// This function is translated to Sql Server's TRY_CONVERT function.
+        /// It cannot be used on the client.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>The converted value or NULL if the conversion fails</returns>
+        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "value", Justification = "[....]: Method is a placeholder for a server-side method.")]
+        public static T TryConvert<T>(object value)
+        {
+            throw Error.SqlMethodOnlyForSql(MethodInfo.GetCurrentMethod());
+        }
     }
 
     public static class SqlHelpers
@@ -937,5 +949,6 @@ namespace System.Data.Linq.SqlClient
 
             return result.ToString();
         }
+
     }
 }

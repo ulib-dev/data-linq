@@ -99,6 +99,33 @@ namespace System.Data.Linq.SqlClient
             return UnaryConvert(typeof(DateTime), typeProvider.From(typeof(DateTime)), expr, expr.SourceExpression);
         }
 
+        internal SqlExpression TryConvertTo(Type clrType, SqlExpression expr)
+        {
+            //
+            // In SQL Server 2008, the new TIME data type cannot be converted to BIGINT, or FLOAT,
+            // or a bunch of other SQL types.
+            //
+            if (clrType.IsGenericType && clrType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                clrType = clrType.GetGenericArguments()[0];
+
+            bool isClrTimeSpanType = clrType == typeof(TimeSpan);
+
+            if (IsSqlTimeType(expr))
+            {
+                if (isClrTimeSpanType)
+                {
+                    // no conversion necessary
+                    return expr;
+                }
+                else
+                {
+                    expr = UnaryTryConvert(typeof(DateTime), typeProvider.From(typeof(DateTime)), expr, expr.SourceExpression);
+                }
+            }
+
+            return UnaryTryConvert(clrType, typeProvider.From(clrType), expr, expr.SourceExpression);
+        }
+
         internal SqlExpression AndAccumulate(SqlExpression left, SqlExpression right)
         {
             if (left == null)
@@ -434,6 +461,13 @@ namespace System.Data.Linq.SqlClient
         {
             System.Diagnostics.Debug.Assert(!targetSqlType.IsRuntimeOnlyType, "Attempted coversion to a runtime type: from = " + expression.SqlType.ToQueryString() + "; to = " + targetSqlType.ToQueryString() + "; source = " + sourceExpression.ToString());
             return new SqlUnary(SqlNodeType.Convert, targetClrType, targetSqlType, expression, null, sourceExpression);
+        }
+
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Unknown reason.")]
+        internal SqlUnary UnaryTryConvert(Type targetClrType, ProviderType targetSqlType, SqlExpression expression, Expression sourceExpression)
+        {
+            System.Diagnostics.Debug.Assert(!targetSqlType.IsRuntimeOnlyType, "Attempted coversion to a runtime type: from = " + expression.SqlType.ToQueryString() + "; to = " + targetSqlType.ToQueryString() + "; source = " + sourceExpression.ToString());
+            return new SqlUnary(SqlNodeType.TryConvert, targetClrType, targetSqlType, expression, null, sourceExpression);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Unknown reason.")]
