@@ -229,7 +229,7 @@ namespace System.Data.Linq
                 {
                     try
                     {
-                        return SecurityUtils.MethodInfoInvoke(mi, null, new object[] { value });
+                        return mi.Invoke(null, new object[] { value });
                     }
                     catch (TargetInvocationException t)
                     {
