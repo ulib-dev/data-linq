@@ -2,7 +2,7 @@
   
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-	  <PackageId>System.Data.Linq.Core</PackageId>
+	  <PackageId>u.system.data.linq.core</PackageId>
     <Version>8.0.1</Version>
     <Description>Unofficial port of Microsoft System.Data.Linq (Linq-to-SQL) to netcore.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
